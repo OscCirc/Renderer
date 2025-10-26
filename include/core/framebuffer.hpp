@@ -41,6 +41,9 @@ public:
     int get_width() const;
     int get_height() const;
 
+    //test
+    void test(const Eigen::Vector4f& color, int index);
+
 private:
     int m_width;
     int m_height;

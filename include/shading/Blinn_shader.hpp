@@ -27,34 +27,40 @@ struct blinn_material{
 };
 
 // Varyings 结构体，用于在顶点着色器和片段着色器之间传递数据
-struct blinn_varyings{
+struct blinn_varyings {
     Eigen::Vector3f world_position; // 世界空间位置
     Eigen::Vector3f depth_position; // 用于阴影映射的深度位置
     Eigen::Vector2f texcoord;       // 纹理坐标
     Eigen::Vector3f normal;         // 世界空间法线
 
-    blinn_varyings operator-(const blinn_varyings &other) const
+    blinn_varyings operator-(const blinn_varyings& other) const
     {
         return {
-            world_position - other.world_position,
-            normal - other.normal,
-            texcoord - other.texcoord};
+            world_position - other.world_position, // 1. 对应 world_position
+            depth_position - other.depth_position, // 2. 对应 depth_position
+            texcoord - other.texcoord,           // 3. 对应 texcoord
+            normal - other.normal                // 4. 对应 normal
+        };
     }
 
-    blinn_varyings operator+(const blinn_varyings &other) const
+    blinn_varyings operator+(const blinn_varyings& other) const
     {
         return {
-            world_position + other.world_position,
-            normal + other.normal,
-            texcoord + other.texcoord};
+            world_position + other.world_position, // 1. 对应 world_position
+            depth_position + other.depth_position, // 2. 对应 depth_position
+            texcoord + other.texcoord,           // 3. 对应 texcoord
+            normal + other.normal                // 4. 对应 normal
+        };
     }
 
     blinn_varyings operator*(float scalar) const
     {
         return {
-            world_position * scalar,
-            normal * scalar,
-            texcoord * scalar};
+            world_position * scalar, // 1. 对应 world_position
+            depth_position * scalar, // 2. 对应 depth_position
+            texcoord * scalar,       // 3. 对应 texcoord
+            normal * scalar        // 4. 对应 normal
+        };
     }
 };
 
@@ -63,13 +69,13 @@ struct blinn_uniforms{
     Eigen::Vector3f light_dir;
     Eigen::Vector3f camera_pos;
     Eigen::Matrix4f model_matrix;
-    Eigen::Matrix3f normal_matrix;
-    Eigen::Matrix4f light_vp_matrix;
+    Eigen::Matrix3f normal_matrix;          // 法线变换矩阵
+    Eigen::Matrix4f light_vp_matrix;      
     Eigen::Matrix4f camera_vp_matrix;
     Eigen::Matrix4f *joint_matrices;
     Eigen::Matrix3f *joint_n_matrices;
-    float ambient_intensity;             // 环境光强度
-    float punctual_intensity;            // 点光源强度
+    float ambient_intensity;                // 环境光强度
+    float punctual_intensity;               // 点光源强度
     Texture *shadow_map;
     /* surface parameters */
     Eigen::Vector4f basecolor;

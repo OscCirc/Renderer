@@ -54,6 +54,7 @@ void Blinn_Phong_Model::update(perframe *perframe)
 
 void Blinn_Phong_Model::draw(Framebuffer *framebuffer, int shadow_pass) 
 {
+    //std::cout << "Blinn_Phong::draw()" << std::endl;
     if (!mesh || !program)
         return;
 
@@ -65,8 +66,13 @@ void Blinn_Phong_Model::draw(Framebuffer *framebuffer, int shadow_pass)
     auto &vertices = mesh->getVertices();
     size_t num_faces = mesh->getNumFaces();
 
+    /*std::cout << "program info: " << std::endl;
+    std::cout << "camera position:\n " << blinn_program->shader_uniforms->camera_pos.transpose() << std::endl;
+    std::cout << "camera vp\n" << blinn_program->shader_uniforms->camera_vp_matrix << std::endl;*/
+
     for (size_t i = 0; i < num_faces; ++i)
     {
+        //std::cout << "Drawing single triangle*********************************************\n";
         for (int j = 0; j < 3; ++j)
         {
             const auto &vertex = vertices[i * 3 + j];
@@ -76,6 +82,7 @@ void Blinn_Phong_Model::draw(Framebuffer *framebuffer, int shadow_pass)
             attribs.normal = vertex.normal;
             attribs.joint = vertex.joint;
             attribs.weight = vertex.weight;
+            //std::cout << "original vertices: " << attribs.position.transpose() << std::endl;
         }
         graphics_draw_triangle(framebuffer, blinn_program);
     }

@@ -1,6 +1,7 @@
 ﻿#include "core/application.hpp"
 #include "core/graphics.hpp"
 #include "utils/resource_cache.hpp"
+#include "math/math.hpp"
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -68,7 +69,6 @@ void Application::run()
     while (!window_->should_close())
     {
         tick();
-
         // 将我们的软件帧缓冲区内容绘制到窗口
         window_->present_framebuffer(*framebuffer_);
 
@@ -90,7 +90,7 @@ void Application::tick()
     delta_time_ = current_time - last_frame_time_;
     last_frame_time_ = current_time;
 
-    process_input();
+    
     update_camera();
     update_light_direction();
     update_click(current_time);
@@ -98,12 +98,10 @@ void Application::tick()
     // 更新场景的 per-frame 数据
     Eigen::Vector3f light_dir = get_light_dir(input_record_.light_theta, input_record_.light_phi);
 
-    Camera_Base light_c(-light_dir, Eigen::Vector3f(0, 0, 0), 1);
-
     scene_->update_per_frame_data(current_time, delta_time_, light_dir,
         camera_->get_position(),
-        light_c.get_view_matrix(),
-        light_c.get_projection_matrix(1, 1, 0, 2),
+        mat4_lookat(-light_dir, Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(0, 1, 0)),
+        mat4_orthographic(1, 1, 0, 2),
         camera_->get_view_matrix(),
         camera_->get_projection_matrix(),
         -1);
@@ -182,8 +180,6 @@ void Application::update_click(float curr_time) {
         input_record_.click_pos = Eigen::Vector2f(click_x, 1.0f - click_y);  // 翻转Y坐标
     }
 }
-
-
 
 void Application::on_mouse_button_pressed(Platform::MouseButton button, bool pressed) {
     Eigen::Vector2f cursor_pos = get_cursor_pos();
@@ -305,6 +301,7 @@ void Application::render_scene()
     }
 
     // 绘制不透明物体
+    //std::cout << "Drawing opaques" << std::endl;
     for (int i = 0; i < num_opaques; ++i) {
         scene_->models[i]->draw(framebuffer_.get(), 0);
     }

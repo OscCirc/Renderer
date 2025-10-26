@@ -44,10 +44,10 @@ namespace SceneLoader
         float shininess;
         std::string diffuse_map;
         std::string specular_map;
-        std::string emission_map;
-        std::string double_sided;
-        std::string enable_blend;
-        float alpha_cutoff;
+        std::string emission_map;   // 自发光贴图
+        std::string double_sided;   // 背面剔除
+        std::string enable_blend;   // 透明混合
+        float alpha_cutoff;         // 透明度裁剪阈值  
     };
 
     struct TransformData
@@ -136,12 +136,12 @@ namespace SceneLoader
         std::string key;
         int count;
         char delimiter;
-        file >> key >> count >> delimiter; // "models:"
+        file >> key >> count >> delimiter;
         models.resize(count);
         for (int i = 0; i < count; ++i)
         {
             auto &model = models[i];
-            file >> key >> model.index >> delimiter; // "model"
+            file >> key >> model.index >> delimiter;
             file >> key >> model.mesh;
             file >> key >> model.skeleton;
             file >> key >> model.attached;
@@ -224,14 +224,12 @@ namespace SceneLoader
             models.push_back(model);
         }
 
-        std::cout << "test" << std::endl;
-        // 调用底层函数完成最终组装
         create_scene(scene, light_data, std::move(models));
     }
 
 } // namespace SceneLoader
 
-// Scene 类的构造函数，作为顶层入口
+
 Scene::Scene(const std::string &filename, const Eigen::Matrix4f &root_transform)
 {
     std::cout << "Current directory: " << std::filesystem::current_path() << std::endl;
@@ -242,7 +240,7 @@ Scene::Scene(const std::string &filename, const Eigen::Matrix4f &root_transform)
     }
 
     std::string key, scene_type;
-    file >> key >> scene_type; // Reads "type: blinn"
+    file >> key >> scene_type;
 
     if (scene_type == "blinn")
     {

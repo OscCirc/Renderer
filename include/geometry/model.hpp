@@ -59,6 +59,10 @@ public:
         this->attached = attached;
         this->opaque = !material.enable_blend;
         this->distance = 0;
+        /*std::cout << "Blinn_Phong_Model() " << mesh_path << std::endl;
+        std::cout << "Model info:" << std::endl;
+        std::cout << "Vertices: " << mesh->getVertices().size() << " Faces: " << mesh->getNumFaces() << std::endl;
+        std::cout << "transform: " << transform << std::endl;*/
     }
 
     virtual void update(perframe *perframe);

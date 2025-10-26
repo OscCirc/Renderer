@@ -23,7 +23,7 @@ Matrix4f Camera_Base::get_view_matrix() const
                  0, 0, 1, -m_position[2],
                  0, 0, 0, 1;
 
-    return translate * view;
+    return  view * translate;
 }
 
 

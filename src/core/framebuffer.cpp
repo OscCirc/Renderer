@@ -30,6 +30,21 @@ void Framebuffer::clear_color(const Eigen::Vector4f& color)
     }
 }
 
+void Framebuffer::test(const Eigen::Vector4f& color, int index) {
+    int patch = m_color_buffer.size() / 4;
+    unsigned char r = float_to_uchar(color.x());
+    unsigned char g = float_to_uchar(color.y());
+    unsigned char b = float_to_uchar(color.z());
+    unsigned char a = float_to_uchar(color.w());
+
+    for (size_t i = index * patch; i < (index + 1) * patch; i += 4) {
+        m_color_buffer[i + 0] = r;
+        m_color_buffer[i + 1] = g;
+        m_color_buffer[i + 2] = b;
+        m_color_buffer[i + 3] = a;
+    }
+}
+
 void Framebuffer::clear_depth(float depth)
 {
     // std::fill 是更高效的写法
@@ -89,7 +104,7 @@ void Framebuffer::set_color(int index, const Eigen::Vector4f& color) {
     if (index < 0 || index > m_width * m_height - 1) {
         return;
     }
-
+    index = index * 4;
     m_color_buffer[index + 0] = float_to_uchar(color.x());
     m_color_buffer[index + 1] = float_to_uchar(color.y());
     m_color_buffer[index + 2] = float_to_uchar(color.z());

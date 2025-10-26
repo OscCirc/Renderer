@@ -150,8 +150,8 @@ static Material get_material(const blinn_varyings &varyings,
 
     mat.shininess = uniforms.shininess;
 
-    // normal from varyings (already normalized by vertex shader)
-    mat.normal = varyings.normal;
+    // normal from varyings 
+    mat.normal = varyings.normal.normalized();
     if (backface) mat.normal = -mat.normal;
 
     // emission

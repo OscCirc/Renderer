@@ -168,8 +168,9 @@ namespace Platform {
         // 转换RGBA到BGRA并拷贝到surface
         for (int y = 0; y < height_; ++y) {
             for (int x = 0; x < width_; ++x) {
+                int flipped = height_ - 1 - y;
                 int src_index = (y * width_ + x) * 4;
-                int dst_index = (y * width_ + x) * 4;
+                int dst_index = (flipped * width_ + x) * 4;
 
                 // RGBA -> BGRA 转换
                 surface_buffer_[dst_index + 0] = color_buffer[src_index + 2]; // B

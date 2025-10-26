@@ -136,6 +136,18 @@ int Program<Attribs, Varyings, Uniforms>::clip_triangle()
     return num_vertices;
 }
 
+//test function
+template <typename Attribs, typename Varyings, typename Uniforms>
+int Program<Attribs, Varyings, Uniforms>::no_clip() {
+    out_coords[0] = in_coords[0];
+    out_coords[1] = in_coords[1];
+    out_coords[2] = in_coords[2];
+    out_varyings[0] = in_varyings[0];
+    out_varyings[1] = in_varyings[1];
+    out_varyings[2] = in_varyings[2];
+    return 3;
+}
+
 template void graphics_draw_triangle<blinn_attribs, blinn_varyings, blinn_uniforms>(Framebuffer *framebuffer, Program<blinn_attribs, blinn_varyings, blinn_uniforms> *program);
 template int Program<blinn_attribs, blinn_varyings, blinn_uniforms>::clip_triangle();
 

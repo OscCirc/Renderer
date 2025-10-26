@@ -7,7 +7,7 @@
 #include "core/framebuffer.hpp"
 #include "core/rasterizer.hpp"
 #include "shading/shader.hpp"
-
+#include <iostream>
 
 
 class IProgram
@@ -74,22 +74,46 @@ public:
 
     // 裁剪函数
     int clip_triangle();
+    int no_clip();
+
+
 };
+
+//void get_blinn_program_info(Program<blinn_attribs, blinn_varyings, blinn_uniforms>* program) {
+//	auto& uniforms = program->get_uniforms();
+//	std::cout << "camera position:\n " << uniforms.camera_pos << std::endl;
+//	std::cout << "camera vp\n" << uniforms.camera_vp_matrix << std::endl;
+//}
+
 
 // 绘制三角形的核心函数
 template <typename Attribs, typename Varyings, typename Uniforms>
 void graphics_draw_triangle(Framebuffer *framebuffer, Program<Attribs, Varyings, Uniforms> *program)
 {
+	//std::cout << "graphics draw triangle()\n";
     // 1. 顶点着色器
     for (int i = 0; i < 3; ++i)
     {
         program->in_coords[i] = program->vertex_shader_ptr(program->shader_attribs[i],
                                                            program->in_varyings[i],
                                                            *program->shader_uniforms);
+		//std::cout << "clip cord: " << program->in_coords[i].transpose() << std::endl;
     }
 
+    
+	//std::cout << "after vertex shader\n";
     // 2. 裁剪
     int num_vertices = program->clip_triangle();
+    
+	/*for (int i = 0; i < num_vertices; ++i) {
+		std::cout << "clipped cord " << i << ":\n" << program->out_coords[i] << std::endl;
+		std::cout << "clipped varyings " << i << ":\n" << 
+            "world position:\n " << program->out_varyings[i].world_position << 
+            " normal:\n" << program->out_varyings[i].normal << std::endl;
+	}*/
+    //test
+    //int num_vertices = program->no_clip();
+    //test end
 
     // 3. 三角形组装与光栅化
     if (num_vertices >= 3)

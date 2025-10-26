@@ -3,6 +3,8 @@
 #include "shading/Blinn_shader.hpp" 
 #include "shading/skybox_shader.hpp"
 
+#include <iostream>
+
 namespace
 {
     constexpr float EPSILON = 1e-6f;
@@ -106,7 +108,11 @@ namespace
         if (program->is_blend_enabled)
         {
             Eigen::Vector4f dst_color = framebuffer->get_color(index);
-            color.head<3>() = color.head<3>() * color.w() + dst_color.head<3>() * (1.0f - color.w());
+            float src_alpha = color.w();
+
+            // 标准 Alpha 混合
+            color.head<3>() = color.head<3>() * src_alpha + dst_color.head<3>() * (1.0f - src_alpha);
+            color.w() = src_alpha + dst_color.w() * (1.0f - src_alpha);
         }
 
         framebuffer->set_color(index, color);
@@ -124,7 +130,15 @@ namespace
             ndc_coords[i] = clip_coords[i].head<3>() / clip_coords[i].w();
         }
 
+        //test code
+        //std::cout << "rasterize_triangle() " << std::endl;
+        
+        /*for (int i = 0; i < 3; ++i) {
+            std::cout << "ndc: " << ndc_coords[i].transpose() << std::endl;
+        }*/
+        
         bool backface = is_back_facing(ndc_coords);
+        //bool backface = false;
         if (backface && !program->is_double_sided)
         {
             return true;
@@ -142,9 +156,9 @@ namespace
         }
 
         BBox bbox = find_bounding_box(screen_coords, framebuffer->get_width(), framebuffer->get_height());
-        for (int y = bbox.min_y; y <= bbox.max_y; y++)
+        for (int x = bbox.min_x; x <= bbox.max_x; x++)
         {
-            for (int x = bbox.min_x; x <= bbox.max_x; x++)
+            for (int y = bbox.min_y; y <= bbox.max_y; y++)
             {
                 Eigen::Vector2f p = {static_cast<float>(x) + 0.5f, static_cast<float>(y) + 0.5f};
                 Eigen::Vector3f weights = calculate_barycentric_weights(screen_coords, p);
@@ -152,9 +166,24 @@ namespace
                 if (weights.x() > -EPSILON && weights.y() > -EPSILON && weights.z() > -EPSILON)
                 {
                     int index = y * framebuffer->get_width() + x;
-                    float depth = weights.dot(Eigen::Map<const Eigen::Vector3f>(screen_depths.data()));
+                    //// 1. 计算插值后的 1/w (这和 interpolate_varyings 中的分母一样)
+                    //float interp_recip_w = recip_w[0] * weights.x() +
+                    //    recip_w[1] * weights.y() +
+                    //    recip_w[2] * weights.z();
 
-                    if (depth <= framebuffer->get_depth(index))
+                    //// 2. 计算插值后的 z_ndc/w
+                    ////    (ndc_coords[i].z() 是 z_ndc)
+                    //float interp_z_ndc_over_w = (ndc_coords[0].z() * recip_w[0] * weights.x()) +
+                    //    (ndc_coords[1].z() * recip_w[1] * weights.y()) +
+                    //    (ndc_coords[2].z() * recip_w[2] * weights.z());
+
+                    //// 3. 获得正确的透视校正后的 z_ndc
+                    //float interp_z_ndc = interp_z_ndc_over_w / interp_recip_w;
+
+                    //// 4. 将 z_ndc [-1, 1] 转换回你的深度缓冲范围 [0, 1]
+                    //float depth = (interp_z_ndc + 1.0f) * 0.5f;
+                    float depth = weights.dot(Eigen::Map<const Eigen::Vector3f>(screen_depths.data()));
+                    if (depth <= framebuffer->get_depth(index)) // 深度检查
                     {
                         program->shader_varyings = interpolate_varyings(varyings, weights, recip_w);
                         draw_fragment(framebuffer, program, index, depth, backface);

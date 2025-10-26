@@ -94,9 +94,8 @@ public:
             v = std::clamp(v, 0.0f, 1.0f);
         }
 
-        // 翻转 v 坐标以匹配常见的纹理坐标系
         auto u_img = u * (width_ - 1);
-        auto v_img = (1.0f - v) * (height_ - 1);
+        auto v_img = v * (height_ - 1);
 
         int x = static_cast<int>(u_img);
         int y = static_cast<int>(v_img);
