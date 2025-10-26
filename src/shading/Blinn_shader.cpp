@@ -57,7 +57,7 @@ static Eigen::Vector4f shadow_vertex_shader(const blinn_attribs& attribs, blinn_
     Eigen::Vector4f world_position = model_matrix * input_position;
     Eigen::Vector4f depth_position = light_vp_matrix * world_position;
 
-    varyings.texcoord = attribs.texcoord; // ？
+    varyings.texcoord = attribs.texcoord; 
 
     return depth_position;
 }

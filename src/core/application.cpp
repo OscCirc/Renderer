@@ -40,7 +40,6 @@ Application::Application(int width, int height, const std::string& title, std::u
 Application::~Application()
 {
     window_.reset();
-    Platform::terminate_platform();
 }
 
 void Application::init_window()
@@ -65,12 +64,21 @@ void Application::init_window()
 void Application::run()
 {
     last_frame_time_ = Platform::Win32Window::get_time();
-
+	print_time_ = last_frame_time_;
+    int num_frames = 0;
     while (!window_->should_close())
     {
         tick();
-        // 将我们的软件帧缓冲区内容绘制到窗口
+        
         window_->present_framebuffer(*framebuffer_);
+        num_frames += 1;
+        if (last_frame_time_ - print_time_ >= 1) {
+            int sum_millis = (int)((last_frame_time_ - print_time_) * 1000);
+            int avg_millis = sum_millis / num_frames;
+			std::cout << "fps: " << num_frames << ", avg: " << avg_millis << " ms" << std::endl;
+            num_frames = 0;
+            print_time_ = last_frame_time_;
+        }
 
         window_->poll_events();
     }
@@ -90,7 +98,7 @@ void Application::tick()
     delta_time_ = current_time - last_frame_time_;
     last_frame_time_ = current_time;
 
-    
+	process_input();
     update_camera();
     update_light_direction();
     update_click(current_time);
@@ -295,24 +303,54 @@ void Application::render_scene()
     framebuffer_->clear_color(scene_->background_color);
     framebuffer_->clear_depth(1.0f);
 
+    //test code
     int num_opaques = 0;
     for (const auto& model : scene_->models) {
-        if (model->opaque) num_opaques++;
+        if (model->opaque) {
+            num_opaques++;
+        }
+        else {
+            break;
+        }
     }
-
-    // 绘制不透明物体
-    //std::cout << "Drawing opaques" << std::endl;
     for (int i = 0; i < num_opaques; ++i) {
         scene_->models[i]->draw(framebuffer_.get(), 0);
     }
 
-    // 绘制天空盒
-    if (scene_->skybox) {
-        scene_->skybox->draw(framebuffer_.get(), 0);
-    }
+    //scene_->skybox->draw(framebuffer_.get(), 0);
 
-    // 绘制透明物体
     for (size_t i = num_opaques; i < scene_->models.size(); ++i) {
         scene_->models[i]->draw(framebuffer_.get(), 0);
+    }
+    //test end
+
+
+    if (scene_->skybox == nullptr || scene_->frame_data.layer_view >= 0)
+    {
+        for (const auto& model : scene_->models) {
+            model->draw(framebuffer_.get(), 0);
+        }
+    }
+    else
+    {
+
+        int num_opaques = 0;
+        for (const auto& model : scene_->models) {
+            if (model->opaque) {
+                num_opaques++;
+            }
+            else {
+                break; 
+            }
+        }
+        for (int i = 0; i < num_opaques; ++i) {
+            scene_->models[i]->draw(framebuffer_.get(), 0);
+        }
+
+        scene_->skybox->draw(framebuffer_.get(), 0);
+
+        for (size_t i = num_opaques; i < scene_->models.size(); ++i) {
+            scene_->models[i]->draw(framebuffer_.get(), 0);
+        }
     }
 }

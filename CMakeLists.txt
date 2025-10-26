@@ -19,8 +19,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # --- Find Dependencies ---
 find_package(Eigen3 CONFIG REQUIRED)
-find_package(OpenCV REQUIRED)
-find_package(glfw3 REQUIRED)
+
 
 # --- Source Files ---
 # 自动收集 src 目录下的所有 .cpp 文件
@@ -35,23 +34,17 @@ add_executable(SoftRenderer ${SOURCE_FILES} ${HEADER_FILES})
 # --- Include Directories ---
 target_include_directories(SoftRenderer PRIVATE
     ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/thirdparty
-    ${OpenCV_INCLUDE_DIRS}
-    ${GLFW_INCLUDE_DIRS}
-)
+    )
 
 # --- Link Libraries ---
 target_link_libraries(SoftRenderer PRIVATE
     Eigen3::Eigen
-    ${OpenCV_LIBS}   
-    ${GLFW_LIBRARIES}
-)
+    )
 
 # --- Third-party Header-Only Libraries (stb_image) ---
 target_compile_definitions(SoftRenderer PRIVATE STB_IMAGE_IMPLEMENTATION)
 
 # --- 创建头文件分组 ---
-# 这将确保头文件在Visual Studio中显示在"头文件"过滤器下
 source_group("Header Files" FILES ${HEADER_FILES})
 
 # --- Post-Build Steps ---

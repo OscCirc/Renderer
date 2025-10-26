@@ -1,6 +1,6 @@
+# Log
 
-
-# 初始图像渲染错误
+初始图像渲染错误
 
 - 禁用所有回调、相机和光照更新 (Application::tick())
 - 禁用阴影通道(Application::render_scene())

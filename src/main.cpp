@@ -6,6 +6,9 @@
 #include <cstdlib>
 #include <ctime>
 
+#define REGISTER_SCENE(name, func) \
+    static SceneAutoRegister auto_register_##name(#name, func)
+
 // 自动注册场景的辅助类
 struct SceneAutoRegister {
     SceneAutoRegister(const std::string& name, SceneCreatorFunc func) {
@@ -14,10 +17,20 @@ struct SceneAutoRegister {
 };
 
 // 使用宏来简化注册过程，静态存储期（包括全局变量和 static 全局变量）的对象，其初始化（即构造函数的调用）必须在 main 函数执行之前完成。
-#define REGISTER_SCENE(name, func) \
-    static SceneAutoRegister auto_register_##name(#name, func)
 
-REGISTER_SCENE(azura, create_azura_scene);
+
+REGISTER_SCENE(azura, create_blinn_azura_scene);
+REGISTER_SCENE(centaur, create_blinn_centaur_scene);
+REGISTER_SCENE(craftsman, create_blinn_craftsman_scene);
+REGISTER_SCENE(elfgirl, create_blinn_elfgirl_scene);
+REGISTER_SCENE(kgirl, create_blinn_kgirl_scene);
+REGISTER_SCENE(lighthouse, create_blinn_lighthouse_scene);
+REGISTER_SCENE(mccree, create_blinn_mccree_scene);
+REGISTER_SCENE(nier2b, create_blinn_nier2b_scene);
+REGISTER_SCENE(phoenix, create_blinn_phoenix_scene);
+REGISTER_SCENE(vivi, create_blinn_vivi_scene);
+REGISTER_SCENE(whip, create_blinn_whip_scene);
+REGISTER_SCENE(witch, create_blinn_witch_scene);
 
 void print_usage() {
     std::cout << "Usage: SoftRenderer.exe [scene_name]" << std::endl;

@@ -21,4 +21,16 @@ std::vector<std::string> get_available_scenes();
 
 // --- 声明具体的场景创建函数 ---
 
-std::unique_ptr<Scene> create_azura_scene();
+std::unique_ptr<Scene> create_blinn_azura_scene();
+std::unique_ptr<Scene> create_blinn_centaur_scene();
+std::unique_ptr<Scene> create_blinn_craftsman_scene();
+std::unique_ptr<Scene> create_blinn_elfgirl_scene();
+std::unique_ptr<Scene> create_blinn_kgirl_scene();
+std::unique_ptr<Scene> create_blinn_lighthouse_scene();
+std::unique_ptr<Scene> create_blinn_mccree_scene();
+std::unique_ptr<Scene> create_blinn_nier2b_scene();
+std::unique_ptr<Scene> create_blinn_phoenix_scene();
+std::unique_ptr<Scene> create_blinn_vivi_scene();
+std::unique_ptr<Scene> create_blinn_whip_scene();
+std::unique_ptr<Scene> create_blinn_witch_scene();
+

@@ -88,6 +88,7 @@ unsigned char Framebuffer::float_to_uchar(float f)
 }
 
 Eigen::Vector4f Framebuffer::get_color(int index) const {
+    index = index * 4;
     return Eigen::Vector4f(
         m_color_buffer[index + 0] / 255.0f,
         m_color_buffer[index + 1] / 255.0f,

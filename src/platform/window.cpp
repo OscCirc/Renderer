@@ -324,8 +324,6 @@ namespace Platform {
         }
     }
 
-    void terminate_platform() {
-        // 清理工作（如果需要的话）
-    }
+
 
 }

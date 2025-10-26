@@ -80,17 +80,16 @@ namespace
         //       ( (1/w_a)*b_a + (1/w_b)*b_b + (1/w_c)*b_c )
         // 其中 V 是 varying, w 是 w分量, b 是重心坐标
 
-        // 计算分子部分
+
         Varyings numerator = src_varyings[0] * (recip_w[0] * weights.x()) +
                              src_varyings[1] * (recip_w[1] * weights.y()) +
                              src_varyings[2] * (recip_w[2] * weights.z());
 
-        // 计算分母部分
         float denominator = recip_w[0] * weights.x() +
                             recip_w[1] * weights.y() +
                             recip_w[2] * weights.z();
 
-        // 返回最终结果
+
         return numerator * (1.0f / denominator);
     }
 
@@ -110,13 +109,14 @@ namespace
             Eigen::Vector4f dst_color = framebuffer->get_color(index);
             float src_alpha = color.w();
 
-            // 标准 Alpha 混合
             color.head<3>() = color.head<3>() * src_alpha + dst_color.head<3>() * (1.0f - src_alpha);
             color.w() = src_alpha + dst_color.w() * (1.0f - src_alpha);
         }
 
         framebuffer->set_color(index, color);
-        framebuffer->set_depth(index, depth);
+        if (!program->is_blend_enabled) {
+            framebuffer->set_depth(index, depth);
+        }
     }
 
     template <typename Attribs, typename Varyings, typename Uniforms>
@@ -138,7 +138,6 @@ namespace
         }*/
         
         bool backface = is_back_facing(ndc_coords);
-        //bool backface = false;
         if (backface && !program->is_double_sided)
         {
             return true;

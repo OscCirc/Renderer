@@ -87,6 +87,7 @@ private:
     // 时间管理
     float last_frame_time_ = 0.0f;
     float delta_time_ = 0.0f;
+	float print_time_ = 0.0f;
 
     // 核心组件
     std::unique_ptr<Scene> scene_;

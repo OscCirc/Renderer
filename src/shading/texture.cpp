@@ -18,10 +18,10 @@ void Texture::ldr_to_texture(const Image& image, TextureUsage usage)
         Eigen::Vector4f pixel = { 0, 0, 0, 255 };
         for (int j = 0; j < channel; ++j) {
             pixel[j] = image.get_ldr_buffer()[i * channel + j] / 255.0f;
-            if (usage == TextureUsage::Color) {
-                pixel.x() - srgb_to_linear(pixel.x());
-                pixel.y() - srgb_to_linear(pixel.y());
-                pixel.z() - srgb_to_linear(pixel.z());
+            if (usage == TextureUsage::Linear) {
+                pixel.x() = srgb_to_linear(pixel.x());
+                pixel.y() = srgb_to_linear(pixel.y());
+                pixel.z() = srgb_to_linear(pixel.z());
             }
         }
         buffer_[i] = pixel;
@@ -46,10 +46,10 @@ void Texture::update_from_color_buffer(const Framebuffer& framebuffer)
     assert(width_ == framebuffer.get_width() && "Texture and Framebuffer width mismatch");
     assert(height_ == framebuffer.get_height() && "Texture and Framebuffer height mismatch");
 
-    int num_pixels = width_ * height_;
-    buffer_.resize(num_pixels);
+    int nuEIGEN_PIxels = width_ * height_;
+    buffer_.resize(nuEIGEN_PIxels);
 
-    for (int i = 0; i < num_pixels; ++i)
+    for (int i = 0; i < nuEIGEN_PIxels; ++i)
     {
         const std::vector<unsigned char>& color = framebuffer.get_color_buffer();
         float r = float_from_uchar(color[i*4 + 0]);
@@ -65,10 +65,10 @@ void Texture::update_from_depth_buffer(const Framebuffer& framebuffer)
     assert(width_ == framebuffer.get_width() && "Texture and Framebuffer width mismatch");
     assert(height_ == framebuffer.get_height() && "Texture and Framebuffer height mismatch");
 
-    int num_pixels = width_ * height_;
-    buffer_.resize(num_pixels);
+    int nuEIGEN_PIxels = width_ * height_;
+    buffer_.resize(nuEIGEN_PIxels);
 
-    for (int i = 0; i < num_pixels; ++i)
+    for (int i = 0; i < nuEIGEN_PIxels; ++i)
     {
         float depth = framebuffer.get_depth_buffer()[i];
         // 将深度值存入纹理的 RGBA 通道

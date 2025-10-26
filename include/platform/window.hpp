@@ -106,6 +106,6 @@ namespace Platform {
 
     // 平台初始化/清理函数
     void initialize_platform();
-    void terminate_platform();
+
 
 } // namespace Platform
