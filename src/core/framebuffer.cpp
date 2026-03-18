@@ -31,7 +31,7 @@ void Framebuffer::clear_color(const Eigen::Vector4f& color)
 }
 
 void Framebuffer::test(const Eigen::Vector4f& color, int index) {
-    int patch = m_color_buffer.size() / 4;
+    int patch = static_cast<int>(m_color_buffer.size()) / 4;
     unsigned char r = float_to_uchar(color.x());
     unsigned char g = float_to_uchar(color.y());
     unsigned char b = float_to_uchar(color.z());

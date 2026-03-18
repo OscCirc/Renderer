@@ -8,6 +8,7 @@
 #include "math/math.hpp"
 #include <eigen3/Eigen/Eigen>
 #include <stdexcept>
+#include <assert.h>
 
 using namespace Eigen;
 

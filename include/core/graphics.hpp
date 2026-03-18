@@ -8,6 +8,7 @@
 #include "core/rasterizer.hpp"
 #include "shading/shader.hpp"
 #include <iostream>
+#include <assert.h>
 
 
 class IProgram

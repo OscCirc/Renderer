@@ -42,10 +42,30 @@ target_link_libraries(SoftRenderer PRIVATE
     )
 
 # --- Third-party Header-Only Libraries (stb_image) ---
-target_compile_definitions(SoftRenderer PRIVATE STB_IMAGE_IMPLEMENTATION)
+# STB_IMAGE_IMPLEMENTATION 已在 image.cpp 中定义，此处不重复定义
+# 屏蔽 MSVC 不安全函数警告 (sscanf 等)
+target_compile_definitions(SoftRenderer PRIVATE _CRT_SECURE_NO_WARNINGS)
 
-# --- 创建头文件分组 ---
-source_group("Header Files" FILES ${HEADER_FILES})
+# 查找 stb 头文件，兼容 vcpkg toolchain 未指定的情况
+find_path(STB_INCLUDE_DIRS "stb_image.h"
+    HINTS
+        "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include"
+        "D:/repo/vcpkg/installed/x64-windows/include"
+        "C:/vcpkg/installed/x64-windows/include"
+)
+if(NOT STB_INCLUDE_DIRS)
+    message(FATAL_ERROR
+        "stb_image.h not found.\n"
+        "请确认已执行: vcpkg install stb\n"
+        "并在 cmake 配置时指定 toolchain:\n"
+        "  -DCMAKE_TOOLCHAIN_FILE=D:/repo/vcpkg/scripts/buildsystems/vcpkg.cmake"
+    )
+endif()
+target_include_directories(SoftRenderer PRIVATE ${STB_INCLUDE_DIRS})
+
+# --- 按目录树生成 VS Filter，镜像磁盘目录结构 ---
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES} ${HEADER_FILES})
 
 # --- Post-Build Steps ---
 add_custom_command(TARGET SoftRenderer POST_BUILD

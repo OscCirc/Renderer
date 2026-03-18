@@ -1,6 +1,9 @@
 ﻿#include "core/scene_creator.hpp"
 #include "geometry/model.hpp" // 需要包含 Model 子类
-#include "utils/resource_cache.hpp" 
+#include "utils/resource_cache.hpp"
+
+// 定义 float 精度的 PI，避免 EIGEN_PI (long double) 截断警告
+static constexpr float PI_F = static_cast<float>(EIGEN_PI);
 
 std::map<std::string, SceneCreatorFunc>& get_scene_creators()
 {
@@ -43,8 +46,8 @@ std::unique_ptr<Scene> create_blinn_azura_scene()
 std::unique_ptr<Scene> create_blinn_centaur_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(0.154f, -7.579f, -30.749f));
-    Eigen::Affine3f rotation_x(Eigen::AngleAxisf(-EIGEN_PI / 2.0f, Eigen::Vector3f::UnitX()));
-    Eigen::Affine3f rotation_y(Eigen::AngleAxisf(-EIGEN_PI / 2.0f, Eigen::Vector3f::UnitY()));
+    Eigen::Affine3f rotation_x(Eigen::AngleAxisf(-PI_F / 2.0f, Eigen::Vector3f::UnitX()));
+    Eigen::Affine3f rotation_y(Eigen::AngleAxisf(-PI_F / 2.0f, Eigen::Vector3f::UnitY()));
     Eigen::Affine3f rotation = rotation_y * rotation_x;
     Eigen::Affine3f scale(Eigen::Scaling(0.016f));
 
@@ -78,7 +81,7 @@ std::unique_ptr<Scene> create_blinn_craftsman_scene()
 std::unique_ptr<Scene> create_blinn_elfgirl_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(2.449f, -2.472f, -20.907f));
-    Eigen::Affine3f rotation(Eigen::AngleAxisf(-EIGEN_PI / 2.0f, Eigen::Vector3f::UnitX()));
+    Eigen::Affine3f rotation(Eigen::AngleAxisf(-PI_F / 2.0f, Eigen::Vector3f::UnitX()));
     Eigen::Affine3f scale(Eigen::Scaling(0.023f));
 
     Eigen::Matrix4f root_transform = (scale * rotation * translation).matrix();
@@ -95,8 +98,8 @@ std::unique_ptr<Scene> create_blinn_elfgirl_scene()
 std::unique_ptr<Scene> create_blinn_kgirl_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(0, -4.937f, -96.547f));
-    Eigen::Affine3f rotation_x(Eigen::AngleAxisf(-EIGEN_PI / 2.0f, Eigen::Vector3f::UnitX()));
-    Eigen::Affine3f rotation_y(Eigen::AngleAxisf(EIGEN_PI / 2.0f, Eigen::Vector3f::UnitY()));
+    Eigen::Affine3f rotation_x(Eigen::AngleAxisf(-PI_F / 2.0f, Eigen::Vector3f::UnitX()));
+    Eigen::Affine3f rotation_y(Eigen::AngleAxisf(PI_F / 2.0f, Eigen::Vector3f::UnitY()));
     Eigen::Affine3f rotation = rotation_y * rotation_x;
     Eigen::Affine3f scale(Eigen::Scaling(0.005f));
 
@@ -114,7 +117,7 @@ std::unique_ptr<Scene> create_blinn_kgirl_scene()
 std::unique_ptr<Scene> create_blinn_lighthouse_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(-78.203f, -222.929f, 16.181f));
-    Eigen::Affine3f rotation(Eigen::AngleAxisf(-3.0f * EIGEN_PI / 4.0f, Eigen::Vector3f::UnitY())); // -135度
+    Eigen::Affine3f rotation(Eigen::AngleAxisf(-3.0f * PI_F / 4.0f, Eigen::Vector3f::UnitY())); // -135度
     Eigen::Affine3f scale(Eigen::Scaling(0.0016f));
 
     Eigen::Matrix4f root_transform = (scale * rotation * translation).matrix();
@@ -147,7 +150,7 @@ std::unique_ptr<Scene> create_blinn_mccree_scene()
 std::unique_ptr<Scene> create_blinn_nier2b_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(4.785f, -105.275f, -23.067f));
-    Eigen::Affine3f rotation(Eigen::AngleAxisf(EIGEN_PI / 2.0f, Eigen::Vector3f::UnitY()));
+    Eigen::Affine3f rotation(Eigen::AngleAxisf(PI_F / 2.0f, Eigen::Vector3f::UnitY()));
     Eigen::Affine3f scale(Eigen::Scaling(0.004f));
 
     Eigen::Matrix4f root_transform = (scale * rotation * translation).matrix();
@@ -164,7 +167,7 @@ std::unique_ptr<Scene> create_blinn_nier2b_scene()
 std::unique_ptr<Scene> create_blinn_phoenix_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(376.905f, -169.495f, 0));
-    Eigen::Affine3f rotation(Eigen::AngleAxisf(EIGEN_PI, Eigen::Vector3f::UnitY()));
+    Eigen::Affine3f rotation(Eigen::AngleAxisf(PI_F, Eigen::Vector3f::UnitY()));
     Eigen::Affine3f scale(Eigen::Scaling(0.001f));
 
     Eigen::Matrix4f root_transform = (scale * rotation * translation).matrix();
@@ -181,7 +184,7 @@ std::unique_ptr<Scene> create_blinn_phoenix_scene()
 std::unique_ptr<Scene> create_blinn_vivi_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(0, 0, -1.369f));
-    Eigen::Affine3f rotation(Eigen::AngleAxisf(-EIGEN_PI / 2.0f, Eigen::Vector3f::UnitX()));
+    Eigen::Affine3f rotation(Eigen::AngleAxisf(-PI_F / 2.0f, Eigen::Vector3f::UnitX()));
     Eigen::Affine3f scale(Eigen::Scaling(0.331f));
 
     Eigen::Matrix4f root_transform = (scale * rotation * translation).matrix();
@@ -198,7 +201,7 @@ std::unique_ptr<Scene> create_blinn_vivi_scene()
 std::unique_ptr<Scene> create_blinn_whip_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(-3732.619f, -93.643f, -1561.663f));
-    Eigen::Affine3f rotation(Eigen::AngleAxisf(EIGEN_PI / 2.0f, Eigen::Vector3f::UnitX()));
+    Eigen::Affine3f rotation(Eigen::AngleAxisf(PI_F / 2.0f, Eigen::Vector3f::UnitX()));
     Eigen::Affine3f scale(Eigen::Scaling(0.0004f));
 
     Eigen::Matrix4f root_transform = (scale * rotation * translation).matrix();
@@ -215,7 +218,7 @@ std::unique_ptr<Scene> create_blinn_whip_scene()
 std::unique_ptr<Scene> create_blinn_witch_scene()
 {
     Eigen::Affine3f translation(Eigen::Translation3f(-17.924f, -16.974f, -32.691f));
-    Eigen::Affine3f rotation(Eigen::AngleAxisf(-EIGEN_PI / 2.0f, Eigen::Vector3f::UnitX()));
+    Eigen::Affine3f rotation(Eigen::AngleAxisf(-PI_F / 2.0f, Eigen::Vector3f::UnitX()));
     Eigen::Affine3f scale(Eigen::Scaling(0.02f));
 
     Eigen::Matrix4f root_transform = (scale * rotation * translation).matrix();

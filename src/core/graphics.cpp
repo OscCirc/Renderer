@@ -5,7 +5,7 @@
 namespace
 {
     // 裁剪平面枚举
-    static enum plane
+    enum plane
     {
         POSITIVE_W,
         POSITIVE_X,

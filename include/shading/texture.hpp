@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <mutex>
+#include <assert.h>
 
 
 class Framebuffer;

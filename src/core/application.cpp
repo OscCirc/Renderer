@@ -10,9 +10,9 @@
 // 初始常量
 static const Eigen::Vector3f CAMERA_POSITION = { 0, 0, 1.5f };
 static const Eigen::Vector3f CAMERA_TARGET = { 0, 0, 0 };
-static const float LIGHT_THETA = EIGEN_PI / 4.0f;
-static const float LIGHT_PHI = EIGEN_PI / 4.0f;
-static const float LIGHT_SPEED = EIGEN_PI;
+static const float LIGHT_THETA = static_cast<float>(EIGEN_PI) / 4.0f;
+static const float LIGHT_PHI = static_cast<float>(EIGEN_PI) / 4.0f;
+static const float LIGHT_SPEED = static_cast<float>(EIGEN_PI);
 
 
 Application::Application(int width, int height, const std::string& title, std::unique_ptr<Scene> scene)
@@ -154,7 +154,7 @@ void Application::update_light_direction()
         input_record_.light_theta += angle;
     }
     if (window_->is_key_pressed(Platform::KeyCode::S)) {
-        input_record_.light_phi = std::min<float>(input_record_.light_phi + angle, EIGEN_PI - EPSILON);
+        input_record_.light_phi = std::min<float>(input_record_.light_phi + angle, static_cast<float>(EIGEN_PI) - EPSILON);
     }
     if (window_->is_key_pressed(Platform::KeyCode::W)) {
         input_record_.light_phi = std::max<float>(input_record_.light_phi - angle, EPSILON);
@@ -334,22 +334,22 @@ void Application::render_scene()
     else
     {
 
-        int num_opaques = 0;
+        int num_opaques_skybox = 0;
         for (const auto& model : scene_->models) {
             if (model->opaque) {
-                num_opaques++;
+                num_opaques_skybox++;
             }
             else {
-                break; 
+                break;
             }
         }
-        for (int i = 0; i < num_opaques; ++i) {
+        for (int i = 0; i < num_opaques_skybox; ++i) {
             scene_->models[i]->draw(framebuffer_.get(), 0);
         }
 
         scene_->skybox->draw(framebuffer_.get(), 0);
 
-        for (size_t i = num_opaques; i < scene_->models.size(); ++i) {
+        for (size_t i = num_opaques_skybox; i < scene_->models.size(); ++i) {
             scene_->models[i]->draw(framebuffer_.get(), 0);
         }
     }
