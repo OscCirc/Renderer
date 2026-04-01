@@ -12,6 +12,8 @@ static float srgb_to_linear(float c)
 }
 void Texture::ldr_to_texture(const Image& image, TextureUsage usage)
 {
+    width_ = mipmaps_[0].width;
+    height_ = mipmaps[0].height;
     int num_of_pixels = width_ * height_;
     for (int i = 0; i < num_of_pixels; ++i) {
         int channel = image.get_channels();
@@ -24,12 +26,14 @@ void Texture::ldr_to_texture(const Image& image, TextureUsage usage)
                 pixel.z() = srgb_to_linear(pixel.z());
             }
         }
-        buffer_[i] = pixel;
+        mipmaps_[0].data[i] = pixel;
     }
 }
 
 void Texture::hdr_to_texture(const Image& image)
 {
+    width_ = mipmaps_[0].width;
+    height_ = mipmaps[0].height;
     int num_of_pixels = width_ * height_;
     for (int i = 0; i < num_of_pixels; ++i) {
         int channel = image.get_channels();
@@ -37,17 +41,19 @@ void Texture::hdr_to_texture(const Image& image)
         for (int j = 0; j < channel; ++j) {
             pixel[j] = image.get_hdr_buffer()[i * channel + j];
         }
-        buffer_[i] = pixel;
+        mipmaps_[0].data[i] = pixel;
     }
 }
 
 void Texture::update_from_color_buffer(const Framebuffer& framebuffer)
 {
+    width_ = mipmaps_[0].width;
+    height_ = mipmaps[0].height;
     assert(width_ == framebuffer.get_width() && "Texture and Framebuffer width mismatch");
     assert(height_ == framebuffer.get_height() && "Texture and Framebuffer height mismatch");
 
     int nuEIGEN_PIxels = width_ * height_;
-    buffer_.resize(nuEIGEN_PIxels);
+    mipmaps_[0].data.resize(nuEIGEN_PIxels);
 
     for (int i = 0; i < nuEIGEN_PIxels; ++i)
     {
@@ -56,22 +62,24 @@ void Texture::update_from_color_buffer(const Framebuffer& framebuffer)
         float g = float_from_uchar(color[i*4 + 1]);
         float b = float_from_uchar(color[i*4 + 2]);
         float a = float_from_uchar(color[i*4 + 3]);
-        buffer_[i] = Eigen::Vector4f(r, g, b, a);
+        mipmaps_[0].data[i] = Eigen::Vector4f(r, g, b, a);
     }
 }
 
 void Texture::update_from_depth_buffer(const Framebuffer& framebuffer)
 {
+    width_ = mipmaps_[0].width;
+    height_ = mipmaps[0].height;
     assert(width_ == framebuffer.get_width() && "Texture and Framebuffer width mismatch");
     assert(height_ == framebuffer.get_height() && "Texture and Framebuffer height mismatch");
 
     int nuEIGEN_PIxels = width_ * height_;
-    buffer_.resize(nuEIGEN_PIxels);
+    mipmaps_[0].data.resize(nuEIGEN_PIxels);
 
     for (int i = 0; i < nuEIGEN_PIxels; ++i)
     {
         float depth = framebuffer.get_depth_buffer()[i];
         // 将深度值存入纹理的 RGBA 通道
-        buffer_[i] = Eigen::Vector4f(depth, depth, depth, 1.0f);
+        mipmaps_[0].data[i] = Eigen::Vector4f(depth, depth, depth, 1.0f);
     }
 }

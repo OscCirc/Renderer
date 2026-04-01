@@ -31,14 +31,18 @@ enum class WrapMode
 class Texture
 {
 private:
-    int width_ = 0;
-    int height_ = 0;
-    std::vector<Eigen::Vector4f> buffer_;
+    std::vector<MipLevel> mipmaps_;
 
     void ldr_to_texture(const Image& image, TextureUsage usage);
 
     void hdr_to_texture(const Image& image);
 public:
+    struct MipLevel{
+        int width;
+        int height;
+        std::vector<Eigen::Vector4f> data;
+    };
+
     // 默认构造函数
     Texture() = default;
 
@@ -47,9 +51,11 @@ public:
     {
         Image image(filename);
 
-        width_ = image.get_width();
-        height_ = image.get_height();
-        buffer_.resize(width_ * height_);
+        mipmaps_.push_back(MipLevel{});
+        auto& base = mipmaps_[0];
+        base.width = image.get_width();
+        base.height = image.get_height();
+        base.data.resize(base.width * base.height);
 
         if (image.get_format() == ImageFormat::LDR) {
             ldr_to_texture(image, usage);
@@ -65,22 +71,28 @@ public:
 
     Texture(int width, int height){
         assert(width > 0 && height > 0);
-        width_ = width;
-        height_ = height;
-        buffer_.resize(width_ * height_);
+        mipmaps_.push_back(MipLevel{});
+        auto& base = mipmaps_[0];
+        base.width = width;
+        base.height = height;
+        base.data.resize(base.width * base.height);
     }
 
     void update_from_color_buffer(const Framebuffer& framebuffer);
     void update_from_depth_buffer(const Framebuffer& framebuffer);
 
     // 获取尺寸
-    int width() const { return width_; }
-    int height() const { return height_; }
-    bool is_valid() const { return !buffer_.empty(); }
+    int width() const { return !mipmaps_.empty() && mipmaps_[0].width; }
+    int height() const { return !mipmaps_.empty() && mipmaps_[0].height; }
+    bool is_valid() const { return !mipmaps_.empty() && !mipmaps_[0].data.empty(); }
 
     // 纹理采样（最近邻）
     Eigen::Vector4f sample(float u, float v, WrapMode mode = WrapMode::Repeat) const
     {
+        int width = mipmaps_[0].width;
+        int height = mipmaps_[0].height;
+        const auto& buffer = mipmaps_[0].data;
+
         if (!is_valid())
             return {0, 0, 0, 0};
 
@@ -95,6 +107,9 @@ public:
             v = std::clamp(v, 0.0f, 1.0f);
         }
 
+        width_ = mipmaps_[0].width;
+        height_ = mipmaps[0].height;
+        
         // -------------------------
         // 最近邻采样
         // -------------------------
