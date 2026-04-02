@@ -30,12 +30,6 @@ enum class WrapMode
 
 class Texture
 {
-private:
-    std::vector<MipLevel> mipmaps_;
-
-    void ldr_to_texture(const Image& image, TextureUsage usage);
-
-    void hdr_to_texture(const Image& image);
 public:
     struct MipLevel{
         int width;
@@ -67,6 +61,7 @@ public:
             throw std::runtime_error("Unsupported texture format for file: " + filename);
         }
         
+        generate_mipmaps();
     }
 
     Texture(int width, int height){
@@ -76,6 +71,8 @@ public:
         base.width = width;
         base.height = height;
         base.data.resize(base.width * base.height);
+
+        generate_mipmaps();
     }
 
     void update_from_color_buffer(const Framebuffer& framebuffer);
@@ -86,12 +83,12 @@ public:
     int height() const { return !mipmaps_.empty() && mipmaps_[0].height; }
     bool is_valid() const { return !mipmaps_.empty() && !mipmaps_[0].data.empty(); }
 
-    // 纹理采样（最近邻）
+    // 纹理采样
     Eigen::Vector4f sample(float u, float v, WrapMode mode = WrapMode::Repeat) const
     {
-        int width = mipmaps_[0].width;
-        int height = mipmaps_[0].height;
-        const auto& buffer = mipmaps_[0].data;
+        int width_ = mipmaps_[0].width;
+        int height_ = mipmaps_[0].height;
+        const auto& buffer_ = mipmaps_[0].data;
 
         if (!is_valid())
             return {0, 0, 0, 0};
@@ -106,9 +103,6 @@ public:
             u = std::clamp(u, 0.0f, 1.0f);
             v = std::clamp(v, 0.0f, 1.0f);
         }
-
-        width_ = mipmaps_[0].width;
-        height_ = mipmaps[0].height;
         
         // -------------------------
         // 最近邻采样
@@ -148,7 +142,14 @@ public:
 
         return top * (1.0f - ty) + bottom * ty;
     }
+private:
+    std::vector<MipLevel> mipmaps_;
 
+    void ldr_to_texture(const Image& image, TextureUsage usage);
+
+    void hdr_to_texture(const Image& image);
+
+    void generate_mipmaps();
 };
 
 class TextureCache{

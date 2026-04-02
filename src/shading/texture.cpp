@@ -1,5 +1,6 @@
 #include "shading/texture.hpp"
 #include "core/framebuffer.hpp"
+#include <eigen3/Eigen/Eigen>
 
 float float_from_uchar(unsigned char c)
 {
@@ -10,10 +11,11 @@ static float srgb_to_linear(float c)
 {
     return (c <= 0.04045f) ? c / 12.92f : std::pow((c + 0.055f) / 1.055f, 2.4f);
 }
+
 void Texture::ldr_to_texture(const Image& image, TextureUsage usage)
 {
-    width_ = mipmaps_[0].width;
-    height_ = mipmaps[0].height;
+    const auto& width_ = mipmaps_[0].width;
+    const auto& height_ = mipmaps_[0].height;
     int num_of_pixels = width_ * height_;
     for (int i = 0; i < num_of_pixels; ++i) {
         int channel = image.get_channels();
@@ -32,8 +34,8 @@ void Texture::ldr_to_texture(const Image& image, TextureUsage usage)
 
 void Texture::hdr_to_texture(const Image& image)
 {
-    width_ = mipmaps_[0].width;
-    height_ = mipmaps[0].height;
+    const auto& width_ = mipmaps_[0].width;
+    const auto& height_ = mipmaps_[0].height;
     int num_of_pixels = width_ * height_;
     for (int i = 0; i < num_of_pixels; ++i) {
         int channel = image.get_channels();
@@ -45,10 +47,48 @@ void Texture::hdr_to_texture(const Image& image)
     }
 }
 
+void Texture::generate_mipmaps()
+{
+    int level = 0;
+    while (mipmaps_[level].width > 1 || mipmaps_[level].height > 1)
+    {
+        const auto& prev = mipmaps_[level];
+        MipLevel next;
+
+        int width = std::max(1, mipmaps_[level].width / 2);
+        int height = std::max(1, mipmaps_[level].height / 2);
+        next.data.resize(width * height);
+        next.width = width;
+        next.height = height;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int x0 = std::min(2 * x, prev.width - 1);
+                int x1 = std::min(2 * x + 1, prev.width - 1);
+                int y0 = std::min(2 * y, prev.height - 1);
+                int y1 = std::min(2 * y + 1, prev.height - 1);
+
+                auto c00 = mipmaps_[level].data[y0 * prev.width + x0];
+                auto c01 = mipmaps_[level].data[y0 * prev.width + x1];
+                auto c10 = mipmaps_[level].data[y1 * prev.width + x0];
+                auto c11 = mipmaps_[level].data[y1 * prev.width + x1];
+
+                next.data[y * width + x] = (c00 + c01 + c10 + c11) * 0.25f;
+            }
+        }
+
+        mipmaps_.push_back(std::move(next));
+
+        level++;
+    }
+}
+
 void Texture::update_from_color_buffer(const Framebuffer& framebuffer)
 {
-    width_ = mipmaps_[0].width;
-    height_ = mipmaps[0].height;
+    const auto& width_ = mipmaps_[0].width;
+    const auto& height_ = mipmaps_[0].height;
     assert(width_ == framebuffer.get_width() && "Texture and Framebuffer width mismatch");
     assert(height_ == framebuffer.get_height() && "Texture and Framebuffer height mismatch");
 
@@ -68,8 +108,8 @@ void Texture::update_from_color_buffer(const Framebuffer& framebuffer)
 
 void Texture::update_from_depth_buffer(const Framebuffer& framebuffer)
 {
-    width_ = mipmaps_[0].width;
-    height_ = mipmaps[0].height;
+    const auto& width_ = mipmaps_[0].width;
+    const auto& height_ = mipmaps_[0].height;
     assert(width_ == framebuffer.get_width() && "Texture and Framebuffer width mismatch");
     assert(height_ == framebuffer.get_height() && "Texture and Framebuffer height mismatch");
 
