@@ -21,11 +21,9 @@ template <typename Attribs, typename Varyings, typename Uniforms>
 class Program : public IProgram
 {
 public:
-    // 使用 using 别名简化类型
     using vertex_shader = vertex_shader_t<Attribs, Varyings, Uniforms>;
     using fragment_shader = fragment_shader_t<Varyings, Uniforms>;
 
-    // 构造函数
     Program(vertex_shader vs, fragment_shader fs, Uniforms initial_uniforms, bool double_sided, bool enable_blend)
         : vertex_shader_ptr(vs),
           fragment_shader_ptr(fs),
@@ -35,14 +33,11 @@ public:
     {
     }
 
-    // 析构函数会自动处理内存释放
     ~Program() = default;
 
-    // 删除拷贝构造和赋值，因为我们手动管理了内存
     Program(const Program &) = delete;
     Program &operator=(const Program &) = delete;
 
-    // 公共接口
     Uniforms &get_uniforms()
     {
         return *shader_uniforms;
@@ -61,7 +56,7 @@ public:
     bool is_double_sided;
     bool is_blend_enabled;
 
-    // 内部数据，设为 public 以便渲染器访问，也可以设为 friend
+    // 内部数据，设为 public 以便渲染器访问
     std::array<Attribs, 3> shader_attribs;
     Varyings shader_varyings;
     std::unique_ptr<Uniforms> shader_uniforms;
@@ -76,8 +71,6 @@ public:
     // 裁剪函数
     int clip_triangle();
     int no_clip();
-
-
 };
 
 //void get_blinn_program_info(Program<blinn_attribs, blinn_varyings, blinn_uniforms>* program) {

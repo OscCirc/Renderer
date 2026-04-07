@@ -32,9 +32,9 @@ class Texture
 {
 public:
     struct MipLevel{
-        int width;
-        int height;
-        std::vector<Eigen::Vector4f> data;
+        int width = 0;
+        int height = 0;
+        std::vector<Eigen::Vector4f> data = {};
     };
 
     // 默认构造函数
@@ -79,17 +79,13 @@ public:
     void update_from_depth_buffer(const Framebuffer& framebuffer);
 
     // 获取尺寸
-    int width() const { return !mipmaps_.empty() && mipmaps_[0].width; }
-    int height() const { return !mipmaps_.empty() && mipmaps_[0].height; }
+    int width() const { return mipmaps_.empty() ? 0 : mipmaps_[0].width; }
+    int height() const { return mipmaps_.empty() ? 0 : mipmaps_[0].height; }
     bool is_valid() const { return !mipmaps_.empty() && !mipmaps_[0].data.empty(); }
 
     // 纹理采样
-    Eigen::Vector4f sample(float u, float v, WrapMode mode = WrapMode::Repeat) const
+    Eigen::Vector4f sample(float u, float v, WrapMode mode = WrapMode::Repeat, float lod = 0.0f) const
     {
-        int width_ = mipmaps_[0].width;
-        int height_ = mipmaps_[0].height;
-        const auto& buffer_ = mipmaps_[0].data;
-
         if (!is_valid())
             return {0, 0, 0, 0};
 
@@ -104,43 +100,21 @@ public:
             v = std::clamp(v, 0.0f, 1.0f);
         }
         
-        // -------------------------
-        // 最近邻采样
-        // -------------------------
-        // auto u_img = u * width_ - 0.5f;
-        // auto v_img = v * height_ - 0.5f;
-        // int x = std::clamp(static_cast<int>(std::round(u_img)), 0, width_ - 1);
-        // int y = std::clamp(static_cast<int>(std::round(v_img)), 0, height_ - 1);
-        // return buffer_[y * width_ + x];
+        float max_level = static_cast<float>(mipmaps_.size() - 1);
+        lod = std::clamp(lod, 0.0f, max_level);
 
         // -------------------------
-        // 双线性插值
+        // 三线性插值
         // -------------------------
-        auto u_img = u * width_ - 0.5f;
-        auto v_img = v * height_ - 0.5f;
+        int level0 = static_cast<int>(std::floor(lod));
+        int level1 = std::min(level0 + 1, static_cast<int>(max_level));
 
-        // 确保坐标在有效范围内
-        u_img = std::max(0.0f, static_cast<float>(u_img));
-        v_img = std::max(0.0f, static_cast<float>(v_img));
+        float frac = lod - static_cast<float>(level0);
 
-        int x0 = static_cast<int>(u_img);
-        int y0 = static_cast<int>(v_img);
+        auto c0 = sample_bilinear(u, v, level0);
+        auto c1 = sample_bilinear(u, v, level1);
 
-        int x1 = std::min(x0 + 1, width_ - 1);
-        int y1 = std::min(y0 + 1, height_ - 1);
-
-        float tx = u_img - x0;
-        float ty = v_img - y0;
-
-        auto c00 = buffer_[y0 * width_ + x0];
-        auto c10 = buffer_[y0 * width_ + x1];
-        auto c01 = buffer_[y1 * width_ + x0];
-        auto c11 = buffer_[y1 * width_ + x1];
-
-        auto top = c00 * (1.0f - tx) + c10 * tx;
-        auto bottom = c01 * (1.0f - tx) + c11 * tx;
-
-        return top * (1.0f - ty) + bottom * ty;
+        return frac * c1 + (1 - frac) * c0;
     }
 private:
     std::vector<MipLevel> mipmaps_;
@@ -148,6 +122,8 @@ private:
     void ldr_to_texture(const Image& image, TextureUsage usage);
 
     void hdr_to_texture(const Image& image);
+
+    Eigen::Vector4f sample_bilinear(float u, float v, int level) const;
 
     void generate_mipmaps();
 };

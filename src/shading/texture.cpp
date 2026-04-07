@@ -47,6 +47,48 @@ void Texture::hdr_to_texture(const Image& image)
     }
 }
 
+Eigen::Vector4f Texture::sample_bilinear(float u, float v, int level) const
+{
+    const auto& width_ = mipmaps_[level].width;
+    const auto& height_ = mipmaps_[level].height;
+    const auto& buffer_ = mipmaps_[level].data;
+
+    auto u_img = u * width_ - 0.5f;
+    auto v_img = v * height_ - 0.5f;
+
+    // -------------------------
+    // 最近邻采样
+    // -------------------------
+    // auto u_img = u * width_ - 0.5f;
+    // auto v_img = v * height_ - 0.5f;
+    // int x = std::clamp(static_cast<int>(std::round(u_img)), 0, width_ - 1);
+    // int y = std::clamp(static_cast<int>(std::round(v_img)), 0, height_ - 1);
+    // return buffer_[y * width_ + x];
+
+    // 确保坐标在有效范围内
+    u_img = std::max(0.0f, static_cast<float>(u_img));
+    v_img = std::max(0.0f, static_cast<float>(v_img));
+
+    int x0 = static_cast<int>(u_img);
+    int y0 = static_cast<int>(v_img);
+
+    int x1 = std::min(x0 + 1, width_ - 1);
+    int y1 = std::min(y0 + 1, height_ - 1);
+
+    float tx = u_img - x0;
+    float ty = v_img - y0;
+
+    auto c00 = buffer_[y0 * width_ + x0];
+    auto c10 = buffer_[y0 * width_ + x1];
+    auto c01 = buffer_[y1 * width_ + x0];
+    auto c11 = buffer_[y1 * width_ + x1];
+
+    auto top = c00 * (1.0f - tx) + c10 * tx;
+    auto bottom = c01 * (1.0f - tx) + c11 * tx;
+
+    return top * (1.0f - ty) + bottom * ty;
+}
+
 void Texture::generate_mipmaps()
 {
     int level = 0;

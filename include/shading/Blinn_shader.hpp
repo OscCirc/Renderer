@@ -33,6 +33,9 @@ struct blinn_varyings {
     Eigen::Vector2f texcoord;       // 纹理坐标
     Eigen::Vector3f normal;         // 世界空间法线
 
+    Eigen::Vector2f dUV_dx = {0.0f, 0.0f};
+    Eigen::Vector2f dUV_dy = {0.0f, 0.0f};
+
     blinn_varyings operator-(const blinn_varyings& other) const
     {
         return {

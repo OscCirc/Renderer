@@ -4,19 +4,12 @@
 #include "shading/skybox_shader.hpp"
 
 #include <iostream>
+#include <type_traits>
 
 namespace
 {
     constexpr float EPSILON = 1e-6f;
 
-    // ... (is_back_facing, viewport_transform, BBox, find_bounding_box, etc.)
-    // ... (calculate_barycentric_weights, interpolate_varyings, draw_fragment)
-    // ... (rasterize_triangle)
-    // [NOTE: All rasterization helper functions from graphics.cpp go here]
-
-    /**
-     * @brief 背面剔除
-     */
     bool is_back_facing(const std::array<Eigen::Vector3f, 3> &ndc_coords)
     {
         const auto &a = ndc_coords[0];
@@ -28,9 +21,6 @@ namespace
         return signed_area <= 0;
     }
 
-    /**
-     * @brief 视口变换
-     */
     Eigen::Vector3f viewport_transform(int width, int height, const Eigen::Vector3f &ndc_coord)
     {
         float x = (ndc_coord.x() + 1.0f) * 0.5f * static_cast<float>(width);
@@ -68,7 +58,6 @@ namespace
 
         return {1.0f - s - t, s, t};
     }
-
     template <typename Varyings>
     Varyings interpolate_varyings(
         const std::array<Varyings, 3> &src_varyings,
@@ -137,14 +126,17 @@ namespace
             std::cout << "ndc: " << ndc_coords[i].transpose() << std::endl;
         }*/
         
+        // 背面剔除
         bool backface = is_back_facing(ndc_coords);
         if (backface && !program->is_double_sided)
         {
             return true;
         }
 
+        // 透视矫正
         std::array<float, 3> recip_w = {1.0f / clip_coords[0].w(), 1.0f / clip_coords[1].w(), 1.0f / clip_coords[2].w()};
 
+        // NDC -> 屏幕空间
         std::array<Eigen::Vector2f, 3> screen_coords;
         std::array<float, 3> screen_depths;
         for (int i = 0; i < 3; i++)
@@ -154,6 +146,45 @@ namespace
             screen_depths[i] = window_coord.z();
         }
 
+        // Mipmap LOD 预计算（仅对有 texcoord 的 Varyings 类型）
+        // 重心坐标对屏幕空间的偏导（在单个三角形内为常量）
+        Eigen::Vector2f dN_dx, dN_dy;
+        float dD_dx = 0, dD_dy = 0;
+        std::array<Eigen::Vector2f, 3> uv_over_w;
+
+        if constexpr (std::is_same_v<Varyings, blinn_varyings>)
+        {
+            Eigen::Vector2f ab = screen_coords[1] - screen_coords[0];
+            Eigen::Vector2f ac = screen_coords[2] - screen_coords[0];
+            float inv_twice_tri_area = 1.0f / (ab.x() * ac.y() - ab.y() * ac.x());
+
+            float dbeta_dx = ac.y() * inv_twice_tri_area;
+            float dbeta_dy = -ac.x() * inv_twice_tri_area;
+            float dgamma_dx = -ab.y() * inv_twice_tri_area;
+            float dgamma_dy = ab.x() * inv_twice_tri_area;
+            float dalpha_dx = -dbeta_dx - dgamma_dx;
+            float dalpha_dy = -dbeta_dy - dgamma_dy;
+
+            // 预计算 UV/w
+            uv_over_w = {
+                varyings[0].texcoord * recip_w[0],
+                varyings[1].texcoord * recip_w[1],
+                varyings[2].texcoord * recip_w[2]
+            };
+
+            /*
+                       UV_A/w_A · α + UV_B/w_B · β + UV_C/w_C · γ      N(x,y)
+            UV(p) = ——————————————————————————————————————————————— = ————————
+                         1/w_A · α  +  1/w_B · β  +  1/w_C · γ         D(x,y)
+            */
+            // 计算N和D的偏导
+            dN_dx = uv_over_w[0] * dalpha_dx + uv_over_w[1] * dbeta_dx + uv_over_w[2] * dgamma_dx;
+            dN_dy = uv_over_w[0] * dalpha_dy + uv_over_w[1] * dbeta_dy + uv_over_w[2] * dgamma_dy;
+            dD_dx = recip_w[0] * dalpha_dx + recip_w[1] * dbeta_dx + recip_w[2] * dgamma_dx;
+            dD_dy = recip_w[0] * dalpha_dy + recip_w[1] * dbeta_dy + recip_w[2] * dgamma_dy;
+        }
+
+        // 填充三角形到屏幕
         BBox bbox = find_bounding_box(screen_coords, framebuffer->get_width(), framebuffer->get_height());
         for (int x = bbox.min_x; x <= bbox.max_x; x++)
         {
@@ -165,26 +196,25 @@ namespace
                 if (weights.x() > -EPSILON && weights.y() > -EPSILON && weights.z() > -EPSILON)
                 {
                     int index = y * framebuffer->get_width() + x;
-                    //// 1. 计算插值后的 1/w (这和 interpolate_varyings 中的分母一样)
-                    //float interp_recip_w = recip_w[0] * weights.x() +
-                    //    recip_w[1] * weights.y() +
-                    //    recip_w[2] * weights.z();
-
-                    //// 2. 计算插值后的 z_ndc/w
-                    ////    (ndc_coords[i].z() 是 z_ndc)
-                    //float interp_z_ndc_over_w = (ndc_coords[0].z() * recip_w[0] * weights.x()) +
-                    //    (ndc_coords[1].z() * recip_w[1] * weights.y()) +
-                    //    (ndc_coords[2].z() * recip_w[2] * weights.z());
-
-                    //// 3. 获得正确的透视校正后的 z_ndc
-                    //float interp_z_ndc = interp_z_ndc_over_w / interp_recip_w;
-
-                    //// 4. 将 z_ndc [-1, 1] 转换回你的深度缓冲范围 [0, 1]
-                    //float depth = (interp_z_ndc + 1.0f) * 0.5f;
-                    float depth = weights.dot(Eigen::Map<const Eigen::Vector3f>(screen_depths.data()));
+                    float depth = weights.dot(Eigen::Map<const Eigen::Vector3f>(screen_depths.data())); // 深度插值（NDC 深度在屏幕空间中可以直接线性插值）
                     if (depth <= framebuffer->get_depth(index)) // 深度检查
                     {
                         program->shader_varyings = interpolate_varyings(varyings, weights, recip_w);
+
+                        // 逐像素 LOD 计算（仅对有 texcoord 的 Varyings 类型）
+                        if constexpr (std::is_same_v<Varyings, blinn_varyings>)
+                        {
+                            float D = recip_w[0] * weights.x() + recip_w[1] * weights.y() + recip_w[2] * weights.z();
+                            Eigen::Vector2f N = uv_over_w[0] * weights.x() + uv_over_w[1] * weights.y() + uv_over_w[2] * weights.z();
+                            float inv_D2 = 1.0f / (D * D);
+
+                            Eigen::Vector2f dUV_dx = (dN_dx * D - dD_dx * N) * inv_D2;
+                            Eigen::Vector2f dUV_dy = (dN_dy * D - dD_dy * N) * inv_D2;
+
+                            program->shader_varyings.dUV_dx = dUV_dx;
+                            program->shader_varyings.dUV_dy = dUV_dy;
+                        }
+
                         draw_fragment(framebuffer, program, index, depth, backface);
                     }
                 }

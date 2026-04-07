@@ -130,13 +130,25 @@ static Material get_material(const blinn_varyings &varyings,
     Material mat;
     Eigen::Vector2f uv = varyings.texcoord;
 
+    auto compute_lod = [&](const std::shared_ptr<Texture>& tex) -> float{
+        if(!tex) return 0.0f;
+
+        Eigen::Vector2f ddx_texel(varyings.dUV_dx.x() * tex->width(), varyings.dUV_dx.y() * tex->height());
+        Eigen::Vector2f ddy_texel(varyings.dUV_dy.x() * tex->width(), varyings.dUV_dy.y() * tex->height());
+
+        float rho = std::max(ddx_texel.norm(), ddy_texel.norm());
+
+        return (rho > 0.0f) ? std::max(0.0f, std::log2(rho)) : 0.0f;
+    };
+    
     // base color
     mat.diffuse = uniforms.basecolor.head<3>();
     mat.alpha = uniforms.basecolor.w();
 
     // diffuse map
     if (uniforms.diffuse_map) {
-        Eigen::Vector4f sample = uniforms.diffuse_map->sample(uv.x(), uv.y());
+        float lod = compute_lod(uniforms.diffuse_map);
+        Eigen::Vector4f sample = uniforms.diffuse_map->sample(uv.x(), uv.y(), WrapMode::Repeat, lod);
         mat.diffuse = mat.diffuse.cwiseProduct(sample.head<3>());
         mat.alpha *= sample.w();
     }
@@ -144,7 +156,8 @@ static Material get_material(const blinn_varyings &varyings,
     // specular
     mat.specular = Eigen::Vector3f::Zero();
     if (uniforms.specular_map) {
-        Eigen::Vector4f sample = uniforms.specular_map->sample(uv.x(), uv.y());
+        float lod = compute_lod(uniforms.specular_map);
+        Eigen::Vector4f sample = uniforms.specular_map->sample(uv.x(), uv.y(), WrapMode::Repeat, lod);
         mat.specular = sample.head<3>();
     }
 
@@ -157,7 +170,8 @@ static Material get_material(const blinn_varyings &varyings,
     // emission
     mat.emission = Eigen::Vector3f::Zero();
     if (uniforms.emission_map) {
-        Eigen::Vector4f sample = uniforms.emission_map->sample(uv.x(), uv.y());
+        float lod = compute_lod(uniforms.emission_map);
+        Eigen::Vector4f sample = uniforms.emission_map->sample(uv.x(), uv.y(), WrapMode::Repeat, lod);
         mat.emission = sample.head<3>();
     }
 
