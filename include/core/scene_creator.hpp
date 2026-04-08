@@ -33,4 +33,5 @@ std::unique_ptr<Scene> create_blinn_phoenix_scene();
 std::unique_ptr<Scene> create_blinn_vivi_scene();
 std::unique_ptr<Scene> create_blinn_whip_scene();
 std::unique_ptr<Scene> create_blinn_witch_scene();
+std::unique_ptr<Scene> create_sampling_test_scene();
 

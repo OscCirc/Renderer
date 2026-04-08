@@ -108,6 +108,7 @@ namespace
         }
     }
 
+    // 光栅化并插值
     template <typename Attribs, typename Varyings, typename Uniforms>
     bool rasterize_triangle(Framebuffer *framebuffer, Program<Attribs, Varyings, Uniforms> *program,
                             const std::array<Eigen::Vector4f, 3>& clip_coords,

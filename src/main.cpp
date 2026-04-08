@@ -31,6 +31,7 @@ REGISTER_SCENE(phoenix, create_blinn_phoenix_scene);
 REGISTER_SCENE(vivi, create_blinn_vivi_scene);
 REGISTER_SCENE(whip, create_blinn_whip_scene);
 REGISTER_SCENE(witch, create_blinn_witch_scene);
+REGISTER_SCENE(sampling_test, create_sampling_test_scene);
 
 void print_usage() {
     std::cout << "Usage: SoftRenderer.exe [scene_name]" << std::endl;

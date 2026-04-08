@@ -54,7 +54,7 @@ namespace Platform {
         AdjustWindowRect(&rect, style, FALSE);                                      // 根据窗口样式调整rect
 
         // 最终窗口的总宽高
-        int window_width = rect.right - rect.left;                                  
+        int window_width = rect.right - rect.left;
         int window_height = rect.bottom - rect.top;
 
         // 转换标题为宽字符
@@ -68,7 +68,7 @@ namespace Platform {
             CW_USEDEFAULT, CW_USEDEFAULT,                                           // 初始位置（设置为系统决定）
             window_width, window_height,
             nullptr, nullptr,
-            GetModuleHandle(nullptr),                                       
+            GetModuleHandle(nullptr),
             nullptr
         );
 
@@ -77,7 +77,7 @@ namespace Platform {
         }
 
         // 设置窗口属性指向这个实例
-        SetPropW(hwnd_, WINDOW_PROP_NAME, this);                                    
+        SetPropW(hwnd_, WINDOW_PROP_NAME, this);
 
         // 显示窗口
         ShowWindow(hwnd_, SW_SHOW);
@@ -304,8 +304,16 @@ namespace Platform {
         case 'W': return KeyCode::W;
         case VK_SPACE: return KeyCode::Space;
         case VK_ESCAPE: return KeyCode::Escape;
+        case '1': return KeyCode::Key1;
+        case '2': return KeyCode::Key2;
+        case '3': return KeyCode::Key3;
         default: return KeyCode::Count;
         }
+    }
+
+    void Win32Window::set_title(const std::string& title) {
+        std::wstring wide_title(title.begin(), title.end());
+        SetWindowTextW(hwnd_, wide_title.c_str());
     }
 
     void initialize_platform() {

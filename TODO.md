@@ -10,7 +10,7 @@
   - 修改 `src/shading/texture.cpp` 的采样函数
   - 解决近距离纹理像素块问题
 
-- [ ] **Mipmap**
+- [x] **Mipmap**
   - 修改 `include/shading/texture.hpp` 和 `src/shading/texture.cpp`
   - 解决远处纹理摩尔纹和闪烁问题
   - 依赖：建议先完成双线性插值

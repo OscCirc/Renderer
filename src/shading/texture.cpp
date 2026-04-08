@@ -2,6 +2,8 @@
 #include "core/framebuffer.hpp"
 #include <eigen3/Eigen/Eigen>
 
+SampleMode g_sample_mode = SampleMode::Trilinear;
+
 float float_from_uchar(unsigned char c)
 {
     return static_cast<float>(c) / 255.0f;
@@ -47,6 +49,16 @@ void Texture::hdr_to_texture(const Image& image)
     }
 }
 
+Eigen::Vector4f Texture::sample_nearest(float u, float v, int level) const
+{
+    const auto& mip = mipmaps_[level];
+    float u_img = u * mip.width - 0.5f;
+    float v_img = v * mip.height - 0.5f;
+    int x = std::clamp(static_cast<int>(std::round(u_img)), 0, mip.width - 1);
+    int y = std::clamp(static_cast<int>(std::round(v_img)), 0, mip.height - 1);
+    return mip.data[y * mip.width + x];
+}
+
 Eigen::Vector4f Texture::sample_bilinear(float u, float v, int level) const
 {
     const auto& width_ = mipmaps_[level].width;
@@ -55,15 +67,6 @@ Eigen::Vector4f Texture::sample_bilinear(float u, float v, int level) const
 
     auto u_img = u * width_ - 0.5f;
     auto v_img = v * height_ - 0.5f;
-
-    // -------------------------
-    // 最近邻采样
-    // -------------------------
-    // auto u_img = u * width_ - 0.5f;
-    // auto v_img = v * height_ - 0.5f;
-    // int x = std::clamp(static_cast<int>(std::round(u_img)), 0, width_ - 1);
-    // int y = std::clamp(static_cast<int>(std::round(v_img)), 0, height_ - 1);
-    // return buffer_[y * width_ + x];
 
     // 确保坐标在有效范围内
     u_img = std::max(0.0f, static_cast<float>(u_img));
@@ -87,6 +90,48 @@ Eigen::Vector4f Texture::sample_bilinear(float u, float v, int level) const
     auto bottom = c01 * (1.0f - tx) + c11 * tx;
 
     return top * (1.0f - ty) + bottom * ty;
+}
+
+Eigen::Vector4f Texture::sample_trilinear(float u, float v, float lod) const
+{
+    float max_level = static_cast<float>(mipmaps_.size() - 1);
+    lod = std::clamp(lod, 0.0f, max_level);
+
+    int level0 = static_cast<int>(std::floor(lod));
+    int level1 = std::min(level0 + 1, static_cast<int>(max_level));
+
+    float frac = lod - static_cast<float>(level0);
+
+    auto c0 = sample_bilinear(u, v, level0);
+    auto c1 = sample_bilinear(u, v, level1);
+
+    return frac * c1 + (1 - frac) * c0;
+}
+
+std::shared_ptr<Texture> Texture::create_checkerboard(int size, int grid)
+{
+    auto tex = std::make_shared<Texture>();
+    tex->mipmaps_.push_back(MipLevel{});
+    auto& base = tex->mipmaps_[0];
+    base.width = size;
+    base.height = size;
+    base.data.resize(size * size);
+
+    int cell_size = size / grid;
+    for (int y = 0; y < size; y++)
+    {
+        for (int x = 0; x < size; x++)
+        {
+            int cx = x / cell_size;
+            int cy = y / cell_size;
+            bool white = (cx + cy) % 2 == 0;
+            float c = white ? 1.0f : 0.0f;
+            base.data[y * size + x] = Eigen::Vector4f(c, c, c, 1.0f);
+        }
+    }
+
+    tex->generate_mipmaps();
+    return tex;
 }
 
 void Texture::generate_mipmaps()

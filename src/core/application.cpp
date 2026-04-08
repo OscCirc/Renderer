@@ -2,6 +2,7 @@
 #include "core/graphics.hpp"
 #include "utils/resource_cache.hpp"
 #include "math/math.hpp"
+#include "shading/texture.hpp"
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -131,6 +132,20 @@ void Application::process_input()
         camera_->camera_set_transform(CAMERA_POSITION, CAMERA_TARGET);
         input_record_.light_theta = LIGHT_THETA;
         input_record_.light_phi = LIGHT_PHI;
+    }
+
+    // 采样模式切换
+    if (window_->is_key_pressed(Platform::KeyCode::Key1)) {
+        g_sample_mode = SampleMode::Nearest;
+        window_->set_title(title_ + " - Nearest");
+    }
+    if (window_->is_key_pressed(Platform::KeyCode::Key2)) {
+        g_sample_mode = SampleMode::Bilinear;
+        window_->set_title(title_ + " - Bilinear");
+    }
+    if (window_->is_key_pressed(Platform::KeyCode::Key3)) {
+        g_sample_mode = SampleMode::Trilinear;
+        window_->set_title(title_ + " - Trilinear (Mipmap)");
     }
 }
 

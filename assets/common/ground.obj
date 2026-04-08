@@ -1,0 +1,12 @@
+# Ground plane on XZ, UV repeated 20 times
+v -10  0  10
+v  10  0  10
+v  10  0 -10
+v -10  0 -10
+vt 0 0
+vt 20 0
+vt 20 20
+vt 0 20
+vn 0 1 0
+f 1/1/1 2/2/1 3/3/1
+f 1/1/1 3/3/1 4/4/1

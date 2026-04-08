@@ -12,6 +12,7 @@ namespace Platform {
     // 键码枚举
     enum class KeyCode {
         A, D, S, W, Space, Escape,
+        Key1, Key2, Key3,
         Count  // 用于计数
     };
 
@@ -56,6 +57,9 @@ namespace Platform {
         // 获取窗口尺寸
         int get_width() const { return width_; }
         int get_height() const { return height_; }
+
+        // 设置窗口标题
+        void set_title(const std::string& title);
 
         // 时间函数
         static float get_time();

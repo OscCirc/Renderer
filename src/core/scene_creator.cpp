@@ -231,3 +231,47 @@ std::unique_ptr<Scene> create_blinn_witch_scene()
         return nullptr;
     }
 }
+
+std::unique_ptr<Scene> create_sampling_test_scene()
+{
+    // 1. 创建 blinn_material: 白色基础色，无纹理路径（稍后手动替换）
+    blinn_material mat;
+    mat.basecolor = Eigen::Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    mat.shininess = 32.0f;
+    mat.diffuse_map = "";
+    mat.specular_map = "";
+    mat.emission_map = "";
+    mat.double_sided = 0;
+    mat.enable_blend = 0;
+    mat.alpha_cutoff = 0.0f;
+
+    // 2. 计算 transform: 缩放 0.5 + 向下平移 Y=-0.3
+    Eigen::Affine3f translation(Eigen::Translation3f(0.0f, -0.3f, 0.0f));
+    Eigen::Affine3f scale(Eigen::Scaling(0.5f));
+    Eigen::Matrix4f transform = (translation * scale).matrix();
+
+    // 3. 创建 Blinn_Phong_Model
+    auto model = std::make_shared<Blinn_Phong_Model>(
+        "assets/common/ground.obj", transform, "", -1, mat);
+
+    // 4. 替换 diffuse_map 为程序化生成的棋盘格纹理
+    auto* blinn_program = static_cast<Program<blinn_attribs, blinn_varyings, blinn_uniforms>*>(
+        model->program.get());
+    blinn_program->get_uniforms().diffuse_map = Texture::create_checkerboard(64, 8);
+
+    // 5. 构造场景（纯环境光，无点光源，无阴影，无天空盒）
+    std::vector<std::shared_ptr<Model_Base>> model_list;
+    model_list.push_back(model);
+
+    Eigen::Vector3f background(0.2f, 0.2f, 0.2f);
+    auto scene = std::make_unique<Scene>(
+        background,
+        nullptr,        // 无天空盒
+        std::move(model_list),
+        1.0f,           // ambient = 1.0
+        0.0f,           // punctual = 0.0
+        0, 0            // 无阴影
+    );
+
+    return scene;
+}

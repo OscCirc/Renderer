@@ -13,6 +13,10 @@
 
 class Framebuffer;
 
+// 采样模式枚举
+enum class SampleMode { Nearest, Bilinear, Trilinear };
+extern SampleMode g_sample_mode;
+
 // 定义纹理用途，用于颜色空间转换
 enum class TextureUsage
 {
@@ -99,23 +103,23 @@ public:
             u = std::clamp(u, 0.0f, 1.0f);
             v = std::clamp(v, 0.0f, 1.0f);
         }
-        
-        float max_level = static_cast<float>(mipmaps_.size() - 1);
-        lod = std::clamp(lod, 0.0f, max_level);
 
-        // -------------------------
-        // 三线性插值
-        // -------------------------
-        int level0 = static_cast<int>(std::floor(lod));
-        int level1 = std::min(level0 + 1, static_cast<int>(max_level));
-
-        float frac = lod - static_cast<float>(level0);
-
-        auto c0 = sample_bilinear(u, v, level0);
-        auto c1 = sample_bilinear(u, v, level1);
-
-        return frac * c1 + (1 - frac) * c0;
+        // 根据采样模式分发
+        switch (g_sample_mode) {
+        case SampleMode::Nearest:
+            return sample_nearest(u, v, 0);
+        case SampleMode::Bilinear:
+            return sample_bilinear(u, v, 0);
+        case SampleMode::Trilinear:
+            return sample_trilinear(u, v, lod);
+        default:
+            return {0, 0, 0, 0};
+        }
     }
+
+    // test
+    // 程序化生成棋盘格纹理
+    static std::shared_ptr<Texture> create_checkerboard(int size = 64, int grid = 8);
 private:
     std::vector<MipLevel> mipmaps_;
 
@@ -123,7 +127,11 @@ private:
 
     void hdr_to_texture(const Image& image);
 
+    Eigen::Vector4f sample_nearest(float u, float v, int level) const;
+
     Eigen::Vector4f sample_bilinear(float u, float v, int level) const;
+
+    Eigen::Vector4f sample_trilinear(float u, float v, float lod) const;
 
     void generate_mipmaps();
 };
