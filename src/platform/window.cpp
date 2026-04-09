@@ -35,8 +35,8 @@ namespace Platform {
         if (!class_registered_) {
             WNDCLASSW wc = {};                                                      // Windows API 注册窗口类结构体
             wc.style = CS_HREDRAW | CS_VREDRAW;                                     // 窗口类风格：宽度高度改变时重绘
-            wc.lpfnWndProc = window_proc;                                           // 消息回调函数（处理所有窗口消息哦）
-            wc.hInstance = GetModuleHandle(nullptr);                                // 指定当前程序实力句柄
+            wc.lpfnWndProc = window_proc;                                           // 消息回调函数（处理所有窗口消息）
+            wc.hInstance = GetModuleHandle(nullptr);                                // 指定当前程序实例句柄
             wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);                          // 设置窗口图标
             wc.hCursor = LoadCursor(nullptr, IDC_ARROW);                            // 设置窗口鼠标指针
             wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));    // 设置窗口背景画刷
