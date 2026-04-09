@@ -15,6 +15,7 @@ materials 10:
         diffuse_map: azura/bijoux_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -24,6 +25,7 @@ materials 10:
         diffuse_map: azura/bijoux_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: on
         alpha_cutoff: 0
@@ -33,6 +35,7 @@ materials 10:
         diffuse_map: azura/body_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: on
         enable_blend: off
         alpha_cutoff: 0
@@ -42,6 +45,7 @@ materials 10:
         diffuse_map: azura/cuissarde_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 1
@@ -51,6 +55,7 @@ materials 10:
         diffuse_map: azura/hair_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: on
         enable_blend: off
         alpha_cutoff: 0
@@ -60,6 +65,7 @@ materials 10:
         diffuse_map: azura/head_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -69,6 +75,7 @@ materials 10:
         diffuse_map: azura/laniere_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -78,6 +85,7 @@ materials 10:
         diffuse_map: azura/motif_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 1
@@ -87,6 +95,7 @@ materials 10:
         diffuse_map: azura/robe_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -96,6 +105,7 @@ materials 10:
         diffuse_map: azura/yeux_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0

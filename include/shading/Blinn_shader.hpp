@@ -9,6 +9,7 @@ struct blinn_attribs{
     Eigen::Vector3f position;
     Eigen::Vector2f texcoord;
     Eigen::Vector3f normal;
+    Eigen::Vector4f tangent;
     Eigen::Vector4f joint;
     Eigen::Vector4f weight;
 };
@@ -20,6 +21,7 @@ struct blinn_material{
     std::string diffuse_map;
     std::string specular_map;
     std::string emission_map;
+    std::string normal_map;
     /* render settings */
     int double_sided;
     int enable_blend;
@@ -32,6 +34,8 @@ struct blinn_varyings {
     Eigen::Vector3f depth_position; // 用于阴影映射的深度位置
     Eigen::Vector2f texcoord;       // 纹理坐标
     Eigen::Vector3f normal;         // 世界空间法线
+    Eigen::Vector3f tangent;        // 世界空间切线
+    Eigen::Vector3f bitangent;      // 世界空间副切线
 
     Eigen::Vector2f dUV_dx = {0.0f, 0.0f};
     Eigen::Vector2f dUV_dy = {0.0f, 0.0f};
@@ -39,30 +43,36 @@ struct blinn_varyings {
     blinn_varyings operator-(const blinn_varyings& other) const
     {
         return {
-            world_position - other.world_position, // 1. 对应 world_position
-            depth_position - other.depth_position, // 2. 对应 depth_position
-            texcoord - other.texcoord,           // 3. 对应 texcoord
-            normal - other.normal                // 4. 对应 normal
+            world_position - other.world_position,
+            depth_position - other.depth_position,
+            texcoord - other.texcoord,           
+            normal - other.normal,
+            tangent - other.tangent,
+            bitangent - other.bitangent
         };
     }
 
     blinn_varyings operator+(const blinn_varyings& other) const
     {
         return {
-            world_position + other.world_position, // 1. 对应 world_position
-            depth_position + other.depth_position, // 2. 对应 depth_position
-            texcoord + other.texcoord,           // 3. 对应 texcoord
-            normal + other.normal                // 4. 对应 normal
+            world_position + other.world_position,
+            depth_position + other.depth_position,
+            texcoord + other.texcoord,           
+            normal + other.normal,
+            tangent + other.tangent,
+            bitangent + other.bitangent
         };
     }
 
     blinn_varyings operator*(float scalar) const
     {
         return {
-            world_position * scalar, // 1. 对应 world_position
-            depth_position * scalar, // 2. 对应 depth_position
-            texcoord * scalar,       // 3. 对应 texcoord
-            normal * scalar        // 4. 对应 normal
+            world_position * scalar, 
+            depth_position * scalar, 
+            texcoord * scalar,       
+            normal * scalar,
+            tangent * scalar,
+            bitangent * scalar
         };
     }
 };
@@ -86,6 +96,7 @@ struct blinn_uniforms{
     std::shared_ptr<Texture> diffuse_map;
     std::shared_ptr<Texture> specular_map;
     std::shared_ptr<Texture> emission_map;
+    std::shared_ptr<Texture> normal_map;
     /* render controls */
     float alpha_cutoff;
     int shadow_pass;

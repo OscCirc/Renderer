@@ -15,6 +15,7 @@ materials 3:
         diffuse_map: centaur/body_diffuse.tga
         specular_map: centaur/body_specular.tga
         emission_map: centaur/body_emission.tga
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -24,6 +25,7 @@ materials 3:
         diffuse_map: centaur/flame_diffuse.tga
         specular_map: null
         emission_map: centaur/flame_emission.tga
+        normal_map: null
         double_sided: off
         enable_blend: on
         alpha_cutoff: 0
@@ -33,6 +35,7 @@ materials 3:
         diffuse_map: centaur/gas_diffuse.tga
         specular_map: centaur/gas_specular.tga
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0

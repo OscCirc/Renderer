@@ -80,6 +80,7 @@ void Blinn_Phong_Model::draw(Framebuffer *framebuffer, int shadow_pass)
             attribs.position = vertex.position;
             attribs.texcoord = vertex.texcoord;
             attribs.normal = vertex.normal;
+            attribs.tangent = vertex.tangent;
             attribs.joint = vertex.joint;
             attribs.weight = vertex.weight;
             //std::cout << "original vertices: " << attribs.position.transpose() << std::endl;

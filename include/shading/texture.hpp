@@ -334,6 +334,11 @@ inline std::shared_ptr<Texture> acquire_color_texture(const std::string& filenam
     return TextureCache::get_instance().acquire(filename, TextureUsage::Color);
 }
 
+inline std::shared_ptr<Texture> acquire_linear_texture(const std::string& filename)
+{
+    return TextureCache::get_instance().acquire(filename, TextureUsage::Linear);
+}
+
 inline std::shared_ptr<Cubemap> acquire_cubemap(const std::string& skybox_name, int blur_level) {
     return Cubemap_cache::get_instance().acquire(skybox_name, blur_level);
 }

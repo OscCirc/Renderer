@@ -15,6 +15,7 @@ materials 2:
         diffuse_map: witch/object_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: on
         enable_blend: off
         alpha_cutoff: 0
@@ -24,6 +25,7 @@ materials 2:
         diffuse_map: witch/witch_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: on
         enable_blend: on
         alpha_cutoff: 0

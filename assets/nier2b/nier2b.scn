@@ -15,6 +15,7 @@ materials 7:
         diffuse_map: nier2b/suit_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -24,6 +25,7 @@ materials 7:
         diffuse_map: nier2b/head_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -33,6 +35,7 @@ materials 7:
         diffuse_map: nier2b/hair0_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -42,6 +45,7 @@ materials 7:
         diffuse_map: nier2b/hair2_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -51,6 +55,7 @@ materials 7:
         diffuse_map: nier2b/hair1_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: on
         enable_blend: on
         alpha_cutoff: 0
@@ -60,6 +65,7 @@ materials 7:
         diffuse_map: nier2b/sword_diffuse.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -69,6 +75,7 @@ materials 7:
         diffuse_map: null
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0

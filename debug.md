@@ -32,3 +32,5 @@ Camera类检查
         检查fragment_shader
             检查get_material，确定sample函数存在问题
                 检查sample函数体，确定是v_image取值使用了错误的翻转。
+
+- 发现问题，检查一下Blinn_shader.cpp的get_material，现在不管采用哪种采样模式，都会额外计算LOD

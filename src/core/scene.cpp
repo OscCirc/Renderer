@@ -45,6 +45,7 @@ namespace SceneLoader
         std::string diffuse_map;
         std::string specular_map;
         std::string emission_map;   // 自发光贴图
+        std::string normal_map;     // 法线贴图
         std::string double_sided;   // 背面剔除
         std::string enable_blend;   // 透明混合
         float alpha_cutoff;         // 透明度裁剪阈值  
@@ -108,6 +109,7 @@ namespace SceneLoader
             file >> key >> mat.diffuse_map;
             file >> key >> mat.specular_map;
             file >> key >> mat.emission_map;
+            file >> key >> mat.normal_map;
             file >> key >> mat.double_sided;
             file >> key >> mat.enable_blend;
             file >> key >> mat.alpha_cutoff;
@@ -213,6 +215,7 @@ namespace SceneLoader
             cpp_material.diffuse_map = wrap_path(material_data.diffuse_map);
             cpp_material.specular_map = wrap_path(material_data.specular_map);
             cpp_material.emission_map = wrap_path(material_data.emission_map);
+            cpp_material.normal_map = wrap_path(material_data.normal_map);
             cpp_material.double_sided = wrap_knob(material_data.double_sided);
             cpp_material.enable_blend = wrap_knob(material_data.enable_blend);
             cpp_material.alpha_cutoff = material_data.alpha_cutoff;

@@ -24,11 +24,11 @@ void Texture::ldr_to_texture(const Image& image, TextureUsage usage)
         Eigen::Vector4f pixel = { 0, 0, 0, 255 };
         for (int j = 0; j < channel; ++j) {
             pixel[j] = image.get_ldr_buffer()[i * channel + j] / 255.0f;
-            if (usage == TextureUsage::Linear) {
-                pixel.x() = srgb_to_linear(pixel.x());
-                pixel.y() = srgb_to_linear(pixel.y());
-                pixel.z() = srgb_to_linear(pixel.z());
-            }
+        }
+        if (usage == TextureUsage::Linear) {
+            pixel.x() = srgb_to_linear(pixel.x());
+            pixel.y() = srgb_to_linear(pixel.y());
+            pixel.z() = srgb_to_linear(pixel.z());
         }
         mipmaps_[0].data[i] = pixel;
     }

@@ -42,6 +42,7 @@ public:
         uniforms.diffuse_map = acquire_color_texture(material.diffuse_map);
         uniforms.specular_map = acquire_color_texture(material.specular_map);
         uniforms.emission_map = acquire_color_texture(material.emission_map);
+        uniforms.normal_map = acquire_linear_texture(material.normal_map);
         uniforms.alpha_cutoff = material.alpha_cutoff;
         auto blinn_program = std::make_unique<Program<blinn_attribs, blinn_varyings, blinn_uniforms>>(
             blinn_vertex_shader,

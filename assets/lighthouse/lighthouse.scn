@@ -15,6 +15,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse0.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -24,6 +25,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse1.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -33,6 +35,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse2.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -42,6 +45,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse3.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -51,6 +55,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse4.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: on
         enable_blend: on
         alpha_cutoff: 0
@@ -60,6 +65,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse5.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -69,6 +75,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse6.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -78,6 +85,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse7.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -87,6 +95,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse8.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -96,6 +105,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse9.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -105,6 +115,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse10.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: on
         enable_blend: on
         alpha_cutoff: 0
@@ -114,6 +125,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse11.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -123,6 +135,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse12.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -132,6 +145,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse13.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -141,6 +155,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse14.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -150,6 +165,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse15.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -159,6 +175,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse16.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -168,6 +185,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse17.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -177,6 +195,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse18.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -186,6 +205,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse19.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -195,6 +215,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse20.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -204,6 +225,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse21.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -213,6 +235,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse22.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -222,6 +245,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse23.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -231,6 +255,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse24.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -240,6 +265,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse25.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -249,6 +275,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse26.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0
@@ -258,6 +285,7 @@ materials 29:
         diffuse_map: lighthouse/lighthouse27.tga
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: on
         enable_blend: off
         alpha_cutoff: 1
@@ -267,6 +295,7 @@ materials 29:
         diffuse_map: null
         specular_map: null
         emission_map: null
+        normal_map: null
         double_sided: off
         enable_blend: off
         alpha_cutoff: 0

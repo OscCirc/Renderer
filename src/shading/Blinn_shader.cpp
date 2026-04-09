@@ -74,13 +74,26 @@ static Eigen::Vector4f common_vertex_shader(const blinn_attribs& attribs, blinn_
     Eigen::Vector4f depth_position = light_vp_matrix * world_position; // 光源视图投影空间位置
     Eigen::Vector4f clip_position = camera_vp_matrix * world_position;
 
+    // world normal
     Eigen::Vector3f input_normal = attribs.normal;
     Eigen::Vector3f normal = (normal_matrix * input_normal).normalized();
+
+    // world tangent
+    Eigen::Vector3f input_tangent = attribs.tangent.head<3>();
+    Eigen::Vector3f tangent = (normal_matrix * input_tangent).normalized();
+    // orthogonalization
+    tangent = (tangent - normal * normal.dot(tangent)).normalized();    
+
+    // world bitangent
+    float handedness = attribs.tangent.w();
+    Eigen::Vector3f bitangent = normal.cross(tangent) * handedness;
 
     varyings.world_position = world_position.head<3>();
     varyings.depth_position = depth_position.head<3>();
     varyings.texcoord = attribs.texcoord;
     varyings.normal = normal;
+    varyings.tangent = tangent;
+    varyings.bitangent = bitangent;
 
     return clip_position;
 }
@@ -164,7 +177,33 @@ static Material get_material(const blinn_varyings &varyings,
     mat.shininess = uniforms.shininess;
 
     // normal from varyings 
-    mat.normal = varyings.normal.normalized();
+    if(uniforms.normal_map)
+    {
+        float lod = compute_lod(uniforms.normal_map);
+        Eigen::Vector4f sample = uniforms.normal_map->sample(uv.x(), uv.y(), WrapMode::Repeat, lod);
+
+        Eigen::Vector3f tangent_normal{
+            sample.x() * 2.0f - 1.0f,
+            sample.y() * 2.0f - 1.0f,
+            sample.z() * 2.0f - 1.0f
+        };
+        tangent_normal.normalize();
+
+        Eigen::Vector3f T = varyings.tangent;
+        Eigen::Vector3f B = varyings.bitangent;
+        Eigen::Vector3f N = varyings.normal;
+
+        Eigen::Matrix3f TBN;
+        TBN.col(0) = T;
+        TBN.col(1) = B;
+        TBN.col(2) = N;
+
+        mat.normal = (TBN * tangent_normal).normalized();
+    }
+    else{
+        mat.normal = varyings.normal.normalized();
+    }
+    
     if (backface) mat.normal = -mat.normal;
 
     // emission
