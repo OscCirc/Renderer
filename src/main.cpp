@@ -1,4 +1,4 @@
-﻿#include "core/application.hpp"
+﻿#include "app/application.hpp"
 #include "core/scene_creator.hpp"
 #include <iostream>
 #include <string>

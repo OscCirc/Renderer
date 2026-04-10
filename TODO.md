@@ -15,7 +15,7 @@
   - 解决远处纹理摩尔纹和闪烁问题
   - 依赖：建议先完成双线性插值
 
-- [ ] **法线贴图（Normal Mapping）**
+- [x] **法线贴图（Normal Mapping）**
   - 修改 `include/shading/Blinn_shader.hpp` 和 `src/shading/Blinn_shader.cpp`
   - 修改 `include/geometry/mesh.hpp` 和 `src/geometry/mesh.cpp`
   - 实现 TBN 矩阵变换，切线空间光照计算
