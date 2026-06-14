@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 
+// "##" is the Token Pasting Operator
 #define REGISTER_SCENE(name, func) \
     static SceneAutoRegister auto_register_##name(#name, func)
 
@@ -17,8 +18,6 @@ struct SceneAutoRegister {
 };
 
 // 使用宏来简化注册过程，静态存储期（包括全局变量和 static 全局变量）的对象，其初始化（即构造函数的调用）必须在 main 函数执行之前完成。
-
-
 REGISTER_SCENE(azura, create_blinn_azura_scene);
 REGISTER_SCENE(centaur, create_blinn_centaur_scene);
 REGISTER_SCENE(craftsman, create_blinn_craftsman_scene);

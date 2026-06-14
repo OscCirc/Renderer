@@ -12,6 +12,13 @@
 主要参考了 C 项目：
 https://github.com/zauonlok/renderer
 
+## 文档入口
+
+- [项目地图](docs/project_map.md)：重新接手项目时的主入口，包含构建、运行、调用链、资源加载和维护建议。
+- [架构文档](ARCHITECTURE.md)：模块关系、类关系和渲染管线图。
+- [Application 拆分指南](docs/refactor_application.md)：应用层重构的历史计划和后续拆分参考。
+- [技术路线](TODO.md)：下一步功能开发计划。
+
 
 ## Screenshots
 

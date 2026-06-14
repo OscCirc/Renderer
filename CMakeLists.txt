@@ -23,10 +23,10 @@ find_package(Eigen3 CONFIG REQUIRED)
 
 # --- Source Files ---
 # 自动收集 src 目录下的所有 .cpp 文件
-file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
 
 # 自动收集 include 目录下的所有头文件
-file(GLOB_RECURSE HEADER_FILES "include/*.h" "include/*.hpp")
+file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS "include/*.h" "include/*.hpp")
 
 # 主可执行文件 - 添加头文件到目标
 add_executable(SoftRenderer ${SOURCE_FILES} ${HEADER_FILES})
