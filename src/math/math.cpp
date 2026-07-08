@@ -9,35 +9,34 @@ Eigen::Matrix4f mat4_lookat(const Eigen::Vector3f& eye,
     const Eigen::Vector3f& target,
     const Eigen::Vector3f& up)
 {
-    // ¼ÆËãÊÓÏß·½Ïò (zÖá)
+    // è®¡ç®—è§†çº¿æ–¹å‘ (zè½´)
     Eigen::Vector3f z_axis = (eye - target).normalized();
 
-    // ¼ÆËãÓÒ·½Ïò (xÖá)
+    // è®¡ç®—å³æ–¹å‘ (xè½´)
     Eigen::Vector3f x_axis = up.cross(z_axis).normalized();
 
-    // ¼ÆËãÉÏ·½Ïò (yÖá)
+    // è®¡ç®—ä¸Šæ–¹å‘ (yè½´)
     Eigen::Vector3f y_axis = z_axis.cross(x_axis);
 
-    // ´´½¨µ¥Î»¾ØÕó
+    // åˆ›å»ºå•ä½çŸ©é˜µ
     Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
 
-    // ÑÏ¸ñ°´ÕÕÔ­Ê¼´úÂëÂß¼­Ìî³ä¾ØÕó
-    // µÚÒ»ĞĞ
+    // ç¬¬ä¸€è¡Œ
     m(0, 0) = x_axis.x();
     m(0, 1) = x_axis.y();
     m(0, 2) = x_axis.z();
 
-    // µÚ¶şĞĞ
+    // ç¬¬äºŒè¡Œ
     m(1, 0) = y_axis.x();
     m(1, 1) = y_axis.y();
     m(1, 2) = y_axis.z();
 
-    // µÚÈıĞĞ
+    // ç¬¬ä¸‰è¡Œ
     m(2, 0) = z_axis.x();
     m(2, 1) = z_axis.y();
     m(2, 2) = z_axis.z();
 
-    // Æ½ÒÆ²¿·Ö
+    // å¹³ç§»éƒ¨åˆ†
     m(0, 3) = -x_axis.dot(eye);
     m(1, 3) = -y_axis.dot(eye);
     m(2, 3) = -z_axis.dot(eye);
@@ -48,20 +47,19 @@ Eigen::Matrix4f mat4_lookat(const Eigen::Vector3f& eye,
 
 
 Eigen::Matrix4f mat4_orthographic(float right, float top, float near, float far) {
-    // È·±£²ÎÊıÓĞĞ§ĞÔ
     assert(right > 0 && top > 0 && far > near);
 
-    // ¼ÆËãzÖá·¶Î§
+    // è®¡ç®—zè½´èŒƒå›´
     float z_range = far - near;
 
-    // ´´½¨µ¥Î»¾ØÕó
+    // åˆ›å»ºå•ä½çŸ©é˜µ
     Eigen::Matrix4f m = Eigen::Matrix4f::Identity();
 
-    // ÉèÖÃÕı½»Í¶Ó°²ÎÊı
-    m(0, 0) = 1.0f / right;   // xÖáËõ·Å
-    m(1, 1) = 1.0f / top;     // yÖáËõ·Å
-    m(2, 2) = -2.0f / z_range; // zÖáËõ·Å
-    m(2, 3) = -(near + far) / z_range; // zÖáÆ½ÒÆ
+    // è®¾ç½®æ­£äº¤æŠ•å½±å‚æ•°
+    m(0, 0) = 1.0f / right;   // xè½´ç¼©æ”¾
+    m(1, 1) = 1.0f / top;     // yè½´ç¼©æ”¾
+    m(2, 2) = -2.0f / z_range; // zè½´ç¼©æ”¾
+    m(2, 3) = -(near + far) / z_range; // zè½´å¹³ç§»
 
     return m;
 }

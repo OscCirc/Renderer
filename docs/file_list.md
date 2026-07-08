@@ -4,9 +4,9 @@
 
 ## 第一阶段：基础
 
-- [ ] `include/utils/global.hpp`          — 全局常量 (EPSILON, PI, to_radians, to_degrees)
-- [ ] `include/math/math.hpp`             — mat4_lookat, mat4_orthographic, float_clamp
-- [ ] `src/math/math.cpp`                 — 矩阵函数实现
+- [x] `include/utils/global.hpp`          — 全局常量 (EPSILON, PI, to_radians, to_degrees)
+- [x] `include/math/math.hpp`             — mat4_lookat, mat4_orthographic, float_clamp
+- [x] `src/math/math.cpp`                 — 矩阵函数实现
 - [ ] `include/utils/resource_cache.hpp`  — ResourceCache 模板基类 (weak_ptr 缓存)
 - [ ] `include/core/framebuffer.hpp`      — 颜色缓冲 + 深度缓冲
 - [ ] `src/core/framebuffer.cpp`          — clear/set/get 实现
