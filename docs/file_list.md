@@ -7,16 +7,16 @@
 - [x] `include/utils/global.hpp`          — 全局常量 (EPSILON, PI, to_radians, to_degrees)
 - [x] `include/math/math.hpp`             — mat4_lookat, mat4_orthographic, float_clamp
 - [x] `src/math/math.cpp`                 — 矩阵函数实现
-- [ ] `include/utils/resource_cache.hpp`  — ResourceCache 模板基类 (weak_ptr 缓存)
-- [ ] `include/core/framebuffer.hpp`      — 颜色缓冲 + 深度缓冲
-- [ ] `src/core/framebuffer.cpp`          — clear/set/get 实现
-- [ ] `include/core/image.hpp`            — stb_image 封装, LDR/HDR 加载保存
-- [ ] `src/core/image.cpp`                — 图像加载/翻转/格式转换实现
+- [x] `include/utils/resource_cache.hpp`  — ResourceCache 模板基类 (weak_ptr 缓存)
+- [x] `include/core/framebuffer.hpp`      — 颜色缓冲 + 深度缓冲
+- [x] `src/core/framebuffer.cpp`          — clear/set/get 实现
+- [x] `include/core/image.hpp`            — stb_image 封装, LDR/HDR 加载保存
+- [x] `src/core/image.cpp`                — 图像加载/翻转/格式转换实现
 
 ## 第二阶段：几何数据
 
-- [ ] `include/geometry/mesh.hpp`         — vertex_attribs, Mesh, MeshCache
-- [ ] `src/geometry/mesh.cpp`             — OBJ 加载, buildMesh
+- [x] `include/geometry/mesh.hpp`         — vertex_attribs, Mesh, MeshCache
+- [x] `src/geometry/mesh.cpp`             — OBJ 加载, buildMesh
 - [ ] `include/geometry/skeleton.hpp`     — Joint, Skeleton, SkeletonCache, 骨骼动画
 - [ ] `src/geometry/skeleton.cpp`         — 骨骼加载, update, 关节矩阵计算
 - [ ] `include/geometry/camera.hpp`       — Camera_Base, Camera, TargetCamera

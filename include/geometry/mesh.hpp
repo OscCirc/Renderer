@@ -26,7 +26,6 @@ public:
     Mesh(const Mesh&) = delete;
     Mesh& operator=(const Mesh&) = delete;
 
-    // 默认的移动构造和移动赋值是安全的
     Mesh(Mesh&&) = default;
     Mesh& operator=(Mesh&&) = default;
     ~Mesh() = default; 

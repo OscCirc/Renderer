@@ -1,10 +1,11 @@
 ﻿#pragma once
 
+#include <utility>      // for std::move
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <mutex>
-#include <functional>
+#include <iostream>
 
 template <typename Resource>
 class ResourceCache

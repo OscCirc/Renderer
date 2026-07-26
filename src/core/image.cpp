@@ -19,6 +19,38 @@ static std::string get_extension(const std::string& filename) {
     return ext;
 }
 
+template <typename T>
+static void flip_h_impl(std::vector<T>& buf, int w, int h, int c)
+{
+    const int half_w = w / 2;
+    const size_t pitch = static_cast<size_t>(w) * c;
+    for(int i = 0; i < h; i++)
+    {
+        for(int j = 0; j < half_w; j++)
+        {
+            for(int k = 0; k < c; k++)
+            {
+                std::swap(buf[i * pitch + j * c + k],
+                          buf[i * pitch + (w - 1 - j) * c + k]);
+            }
+        }
+    }
+}
+
+template <typename T>
+static void flip_v_impl(std::vector<T>& buf, int w, int h, int c)
+{
+    const size_t row_size = static_cast<size_t>(w) * c;
+    const int half_h = h / 2;
+    for(int row = 0; row < half_h; row++)
+    {
+        std::swap_ranges(
+            buf.begin() + row * row_size,
+            buf.begin() + (row + 1) * row_size,
+            buf.begin() + (h - 1 - row) * row_size
+        );
+    }
+}
 void convertBGRAtoRGBA(unsigned char* data, int& width, int& height) {
     const int totalPixels = width * height;
     for (int i = 0; i < totalPixels; i++) {
@@ -122,52 +154,20 @@ bool Image::save(const std::string& filename) const {
 }
 
 void Image::flip_h() {
-    const int half_width = width / 2;
-    const size_t pitch = static_cast<size_t>(width) * channels;
     if (format == ImageFormat::LDR) {
-        for (int r = 0; r < height; ++r) {
-            for (int c = 0; c < half_width; ++c) {
-                for (int k = 0; k < channels; ++k) {
-                    std::swap(ldr_buffer[r * pitch + c * channels + k],
-                        ldr_buffer[r * pitch + (width - 1 - c) * channels + k]);
-                }
-            }
-        }
+        flip_h_impl(ldr_buffer, width, height, channels);
     }
     else {
-        for (int r = 0; r < height; ++r) {
-            for (int c = 0; c < half_width; ++c) {
-                for (int k = 0; k < channels; ++k) {
-                    std::swap(hdr_buffer[r * pitch + c * channels + k],
-                        hdr_buffer[r * pitch + (width - 1 - c) * channels + k]);
-                }
-            }
-        }
+        flip_h_impl(hdr_buffer, width, height, channels);
     }
 }
 
 void Image::flip_v() {
-    const int half_height = height / 2;
-    const size_t row_size = static_cast<size_t>(width) * channels;
     if (format == ImageFormat::LDR) {
-        std::vector<unsigned char> temp_row(row_size);
-        for (int r = 0; r < half_height; ++r) {
-            unsigned char* row1 = &ldr_buffer[r * row_size];
-            unsigned char* row2 = &ldr_buffer[(height - 1 - r) * row_size];
-            std::copy(row1, row1 + row_size, temp_row.begin());
-            std::copy(row2, row2 + row_size, row1);
-            std::copy(temp_row.begin(), temp_row.end(), row2);
-        }
+        flip_v_impl(ldr_buffer, width, height, channels);
     }
     else {
-        std::vector<float> temp_row(row_size);
-        for (int r = 0; r < half_height; ++r) {
-            float* row1 = &hdr_buffer[r * row_size];
-            float* row2 = &hdr_buffer[(height - 1 - r) * row_size];
-            std::copy(row1, row1 + row_size, temp_row.begin());
-            std::copy(row2, row2 + row_size, row1);
-            std::copy(temp_row.begin(), temp_row.end(), row2);
-        }
+        flip_v_impl(hdr_buffer, width, height, channels);
     }
 }
 
