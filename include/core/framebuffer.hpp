@@ -23,11 +23,10 @@ public:
     void clear_depth(float depth = 1.0f);
 
     // 获取缓冲区数据指针（给渲染器或窗口系统使用）
-    
-    std::vector<unsigned char>& get_color_buffer();
+    std::vector<Eigen::Vector4f>& get_color_buffer();
     std::vector<float>& get_depth_buffer();
 
-    const std::vector<unsigned char>& get_color_buffer() const;
+    const std::vector<Eigen::Vector4f>& get_color_buffer() const;
     const std::vector<float>& get_depth_buffer() const;
 
     // 获取颜色像素（支持读取单个像素）
@@ -41,15 +40,9 @@ public:
     int get_width() const;
     int get_height() const;
 
-    //test
-    void test(const Eigen::Vector4f& color, int index);
-
 private:
-    int m_width;
-    int m_height;
-    std::vector<unsigned char> m_color_buffer;
-    std::vector<float> m_depth_buffer;
-
-    // 辅助函数
-    static unsigned char float_to_uchar(float f);
+    int width_;
+    int height_;
+    std::vector<Eigen::Vector4f> color_buffer_;    // RBGA: RBG in [0, \infinity), A in [0,1]
+    std::vector<float> depth_buffer_;
 };

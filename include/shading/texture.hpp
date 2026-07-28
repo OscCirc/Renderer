@@ -17,12 +17,10 @@ class Framebuffer;
 enum class SampleMode { Nearest, Bilinear, Trilinear };
 extern SampleMode g_sample_mode;
 
-// 定义纹理用途，用于颜色空间转换
-enum class TextureUsage
+enum class TextureColorSpace
 {
-    Generic, // 通用数据，不做转换
-    Color,   // LDR 颜色纹理 (sRGB)
-    Linear   // 线性数据，如法线贴图、金属度贴图
+    sRGB,       // LDR 颜色纹理 (sRGB)
+    Linear      // 线性数据，如法线贴图、金属度贴图
 };
 
 // 定义纹理环绕（采样）模式
@@ -38,14 +36,19 @@ public:
     struct MipLevel{
         int width = 0;
         int height = 0;
-        std::vector<Eigen::Vector4f> data = {};
+        std::vector<Eigen::Vector4f> data = {}; // 线性空间值
     };
 
-    // 默认构造函数
     Texture() = default;
 
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+
+    Texture(Texture&&) = default;
+    Texture& operator=(Texture&&) = default;
+
     // 从文件加载的构造函数
-    Texture(const std::string &filename, TextureUsage usage = TextureUsage::Color)
+    Texture(const std::string &filename, TextureColorSpace color_space= TextureColorSpace::sRGB)
     {
         Image image(filename);
 
@@ -55,16 +58,7 @@ public:
         base.height = image.get_height();
         base.data.resize(base.width * base.height);
 
-        if (image.get_format() == ImageFormat::LDR) {
-            ldr_to_texture(image, usage);
-        }
-        else if (image.get_format() == ImageFormat::HDR) {
-            hdr_to_texture(image);
-        }
-        else {
-            throw std::runtime_error("Unsupported texture format for file: " + filename);
-        }
-        
+        to_texture(image, image.get_format(), color_space);
         generate_mipmaps();
     }
 
@@ -123,9 +117,11 @@ public:
 private:
     std::vector<MipLevel> mipmaps_;
 
-    void ldr_to_texture(const Image& image, TextureUsage usage);
+    void ldr_to_texture(const Image& image, TextureColorSpace color_space);
 
     void hdr_to_texture(const Image& image);
+
+    void to_texture(const Image& image, ImageFormat format, TextureColorSpace color_space);
 
     Eigen::Vector4f sample_nearest(float u, float v, int level) const;
 
@@ -144,7 +140,7 @@ public:
         return instance;
     }
 
-    std::shared_ptr<Texture> acquire(const std::string& filename, TextureUsage usage) {
+    std::shared_ptr<Texture> acquire(const std::string& filename, TextureColorSpace color_space) {
         if (filename.empty()) {
             return nullptr;
         }
@@ -152,7 +148,8 @@ public:
         // 加锁以保证线程安全
         std::lock_guard<std::mutex> lock(cache_mutex_);
 
-        auto it = cache_.find(filename);
+        const std::string key = filename + '#' + std::to_string(static_cast<int>(color_space));
+        auto it = cache_.find(key);
         if (it != cache_.end()) {
             if (auto shared = it->second.lock()) {
                 // 缓存命中且对象仍然存活
@@ -160,8 +157,8 @@ public:
             }
         }
 
-        auto new_Texture = std::make_shared<Texture>(filename, usage);
-        cache_[filename] = new_Texture; // 存入 weak_ptr
+        auto new_Texture = std::make_shared<Texture>(filename, color_space);
+        cache_[key] = new_Texture; // 存入 weak_ptr
         return new_Texture;
     }
 private:
@@ -238,11 +235,11 @@ private:
 
 public:
     // 构造函数：从六个文件加载
-    Cubemap(const std::array<std::string, 6> &filenames, TextureUsage usage = TextureUsage::Color)
+    Cubemap(const std::array<std::string, 6> &filenames, TextureColorSpace color_space= TextureColorSpace::Linear)
     {
         for (int i = 0; i < 6; ++i)
         {
-            faces_[i] = TextureCache::get_instance().acquire(filenames[i], usage);
+            faces_[i] = TextureCache::get_instance().acquire(filenames[i], color_space);
         }
     }
 
@@ -314,7 +311,7 @@ public:
             }
         }
 
-        auto new_cubemap = std::make_shared<Cubemap>(filenames, TextureUsage::Color);
+        auto new_cubemap = std::make_shared<Cubemap>(filenames, TextureColorSpace::Linear);
         cache_[key] = new_cubemap;
         return new_cubemap;
     }
@@ -331,12 +328,12 @@ private:
 
 inline std::shared_ptr<Texture> acquire_color_texture(const std::string& filename)
 {
-    return TextureCache::get_instance().acquire(filename, TextureUsage::Color);
+    return TextureCache::get_instance().acquire(filename, TextureColorSpace::sRGB);
 }
 
 inline std::shared_ptr<Texture> acquire_linear_texture(const std::string& filename)
 {
-    return TextureCache::get_instance().acquire(filename, TextureUsage::Linear);
+    return TextureCache::get_instance().acquire(filename, TextureColorSpace::Linear);
 }
 
 inline std::shared_ptr<Cubemap> acquire_cubemap(const std::string& skybox_name, int blur_level) {

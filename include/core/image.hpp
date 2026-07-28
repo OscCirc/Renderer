@@ -11,26 +11,26 @@ enum class ImageFormat {
 
 class Image {
 public:
-    // ¹¤³§º¯Êı£º´ÓÎÄ¼ş¼ÓÔØÍ¼Ïñ
+    // å·¥å‚å‡½æ•°ï¼šä»æ–‡ä»¶åŠ è½½å›¾åƒ
     Image(const std::string& filename);
 
-    // ¹¹Ôìº¯Êı£º´´½¨Ò»¸ö¿Õ°×Í¼Ïñ
+    // æ„é€ å‡½æ•°ï¼šåˆ›å»ºä¸€ä¸ªç©ºç™½å›¾åƒ
     Image(int width, int height, int channels, ImageFormat format);
 
-    // ±£´æÍ¼Ïñµ½ÎÄ¼ş
+    // ä¿å­˜å›¾åƒåˆ°æ–‡ä»¶
     bool save(const std::string& filename) const;
 
-    // Í¼Ïñ´¦Àí
+    // å›¾åƒå¤„ç†
     void flip_h();
     void flip_v();
 
-    // ·ÃÎÊÆ÷
+    // è®¿é—®å™¨
     int get_width() const { return width; }
     int get_height() const { return height; }
     int get_channels() const { return channels; }
     ImageFormat get_format() const { return format; }
 
-    // »ñÈ¡Ô­Ê¼ÏñËØÊı¾İÖ¸Õë
+    // è·å–åŸå§‹åƒç´ æ•°æ®æŒ‡é’ˆ
     const unsigned char* get_ldr_buffer() const;
     unsigned char* get_ldr_buffer();
     const float* get_hdr_buffer() const;

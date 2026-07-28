@@ -17,17 +17,17 @@
 
 - [x] `include/geometry/mesh.hpp`         — vertex_attribs, Mesh, MeshCache
 - [x] `src/geometry/mesh.cpp`             — OBJ 加载, buildMesh
-- [ ] `include/geometry/skeleton.hpp`     — Joint, Skeleton, SkeletonCache, 骨骼动画
-- [ ] `src/geometry/skeleton.cpp`         — 骨骼加载, update, 关节矩阵计算
-- [ ] `include/geometry/camera.hpp`       — Camera_Base, Camera, TargetCamera
-- [ ] `src/geometry/camera.cpp`           — view/projection 矩阵实现
+- [x] `include/geometry/skeleton.hpp`     — Joint, Skeleton, SkeletonCache, 骨骼动画
+- [x] `src/geometry/skeleton.cpp`         — 骨骼加载, update, 关节矩阵计算
+- [x] `include/geometry/camera.hpp`       — Camera_Base, Camera, TargetCamera
+- [x] `src/geometry/camera.cpp`           — view/projection 矩阵实现
 
 ## 第三阶段：着色与纹理
 
-- [ ] `include/shading/shader.hpp`        — vertex_shader_t, fragment_shader_t 类型定义
-- [ ] `include/shading/light.hpp`         — light 结构体
-- [ ] `include/shading/texture.hpp`       — Texture, Cubemap, TextureCache, Cubemap_cache
-- [ ] `src/shading/texture.cpp`           — 纹理加载, 采样 (Nearest/Bilinear/Trilinear), mipmap
+- [x] `include/shading/shader.hpp`        — vertex_shader_t, fragment_shader_t 类型定义
+- [x] `include/shading/light.hpp`         — light 结构体
+- [x] `include/shading/texture.hpp`       — Texture, Cubemap, TextureCache, Cubemap_cache
+- [x] `src/shading/texture.cpp`           — 纹理加载, 采样 (Nearest/Bilinear/Trilinear), mipmap
 - [ ] `include/shading/Blinn_shader.hpp`  — blinn_attribs/varyings/uniforms, shader 函数声明
 - [ ] `src/shading/Blinn_shader.cpp`      — Blinn-Phong 顶点/片段着色器实现
 - [ ] `include/shading/skybox_shader.hpp` — skybox_attribs/varyings/uniforms, shader 函数声明

@@ -9,106 +9,106 @@
 
 namespace Platform {
 
-    // ¼üÂëÃ¶¾Ù
+    // é”®ç æšä¸¾
     enum class KeyCode {
         A, D, S, W, Space, Escape,
         Key1, Key2, Key3,
-        Count  // ÓÃÓÚ¼ÆÊı
+        Count  // ç”¨äºè®¡æ•°
     };
 
-    // Êó±ê°´Å¥Ã¶¾Ù
+    // é¼ æ ‡æŒ‰é’®æšä¸¾
     enum class MouseButton {
         Left, Right,
-        Count  // ÓÃÓÚ¼ÆÊı
+        Count  // ç”¨äºè®¡æ•°
     };
 
-    // »Øµ÷º¯ÊıÀàĞÍ
+    // å›è°ƒå‡½æ•°ç±»å‹
     using KeyCallback = std::function<void(KeyCode key, bool pressed)>;
     using MouseButtonCallback = std::function<void(MouseButton button, bool pressed)>;
     using ScrollCallback = std::function<void(float offset)>;
     using CursorPosCallback = std::function<void(double xpos, double ypos)>;
 
-    // Win32´°¿ÚÀà
+    // Win32çª—å£ç±»
     class Win32Window {
     public:
         Win32Window(const std::string& title, int width, int height);
         ~Win32Window();
 
-        // ½ûÖ¹¿½±´ºÍ¸³Öµ
+        // ç¦æ­¢æ‹·è´å’Œèµ‹å€¼
         Win32Window(const Win32Window&) = delete;
         Win32Window& operator=(const Win32Window&) = delete;
 
-        // Ö÷Òª½Ó¿Ú
+        // ä¸»è¦æ¥å£
         bool should_close() const { return should_close_; }
         void poll_events();
         void present_framebuffer(const Framebuffer& framebuffer);
 
-        // ÊäÈë²éÑ¯
+        // è¾“å…¥æŸ¥è¯¢
         bool is_key_pressed(KeyCode key) const;
         bool is_mouse_button_pressed(MouseButton button) const;
         void get_cursor_position(float& x, float& y) const;
 
-        // ÉèÖÃ»Øµ÷
+        // è®¾ç½®å›è°ƒ
         void set_key_callback(KeyCallback callback) { key_callback_ = std::move(callback); }
         void set_mouse_button_callback(MouseButtonCallback callback) { mouse_button_callback_ = std::move(callback); }
         void set_scroll_callback(ScrollCallback callback) { scroll_callback_ = std::move(callback); }
         void set_cursor_pos_callback(CursorPosCallback callback) { cursor_pos_callback_ = std::move(callback); }
 
-        // »ñÈ¡´°¿Ú³ß´ç
+        // è·å–çª—å£å°ºå¯¸
         int get_width() const { return width_; }
         int get_height() const { return height_; }
 
-        // ÉèÖÃ´°¿Ú±êÌâ
+        // è®¾ç½®çª—å£æ ‡é¢˜
         void set_title(const std::string& title);
 
-        // Ê±¼äº¯Êı
+        // æ—¶é—´å‡½æ•°
         static float get_time();
 
     private:
-        // ´°¿Ú´´½¨ºÍÏú»Ù
+        // çª—å£åˆ›å»ºå’Œé”€æ¯
         void create_window();
         void create_surface();
         void destroy_surface();
 
-        // ÏûÏ¢´¦Àí
+        // æ¶ˆæ¯å¤„ç†
         static LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
         void handle_key_message(WPARAM virtual_key, bool pressed);
         void handle_mouse_button_message(MouseButton button, bool pressed);
         void handle_scroll_message(float offset);
 
-        // ¸¨Öúº¯Êı
+        // è¾…åŠ©å‡½æ•°
         static KeyCode virtual_key_to_keycode(WPARAM virtual_key);
         void blit_framebuffer_to_surface(const Framebuffer& framebuffer);
 
-        // ³ÉÔ±±äÁ¿
+        // æˆå‘˜å˜é‡
         std::string title_;
         int width_;
         int height_;
         bool should_close_;
 
-        // Win32Ïà¹Ø
+        // Win32ç›¸å…³
         HWND hwnd_;
         HDC memory_dc_;
         HBITMAP dib_bitmap_;
         unsigned char* surface_buffer_;
 
-        // ÊäÈë×´Ì¬
+        // è¾“å…¥çŠ¶æ€
         std::array<bool, static_cast<size_t>(KeyCode::Count)> keys_{};
         std::array<bool, static_cast<size_t>(MouseButton::Count)> mouse_buttons_{};
 
-        // »Øµ÷º¯Êı
+        // å›è°ƒå‡½æ•°
         KeyCallback key_callback_;
         MouseButtonCallback mouse_button_callback_;
         ScrollCallback scroll_callback_;
         CursorPosCallback cursor_pos_callback_;
 
-        // ¾²Ì¬³ÉÔ±
+        // é™æ€æˆå‘˜
         static bool class_registered_;
         static const wchar_t* WINDOW_CLASS_NAME;
         static const wchar_t* WINDOW_PROP_NAME;
     };
 
-    // Æ½Ì¨³õÊ¼»¯/ÇåÀíº¯Êı
+    // å¹³å°åˆå§‹åŒ–/æ¸…ç†å‡½æ•°
     void initialize_platform();
 
 

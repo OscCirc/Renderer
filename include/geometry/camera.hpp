@@ -68,7 +68,7 @@ public:
     Matrix4f get_projection_matrix(float fov, float aspect, float near, float far) const;
     
     // 相机控制方法
-    void rotate(float delta_yaw, float delta_pitch);  // 偏航和俯仰
+    void rotate(float delta_yaw, float delta_pitch);  
     void move_forward(float distance);
     void move_right(float distance);
     void move_up(float distance);
@@ -99,6 +99,7 @@ private:
         return delta_x + delta_y;
     }
 
+    // Calcualte relative position to target
     Vector3f calculate_offset(const Vector3f& from_target, const motion& motion) const {
         // from_target = position - target
         float radius = from_target.norm();

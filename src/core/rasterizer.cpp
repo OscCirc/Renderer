@@ -91,8 +91,9 @@ namespace
 
         if (discard) return;
 
-        color = color.cwiseMax(0.0f).cwiseMin(1.0f);
-
+        color.head<3>() = color.head<3>().cwiseMax(0.0f);   // RGB为线性HDR颜色
+        color.w() = std::clamp(color.w(), 0.0f, 1.0f);      // Alpha限制在0~1
+        
         if (program->is_blend_enabled)
         {
             Eigen::Vector4f dst_color = framebuffer->get_color(index);

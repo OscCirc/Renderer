@@ -1,3 +1,5 @@
+#include "utils/color_space.hpp"
+#include "shading/tone_mapping.hpp"
 #include "platform/window.hpp"
 #include <iostream>
 #include <cassert>
@@ -5,9 +7,17 @@
 #include <stdexcept>
 #include <cstring>
 
+namespace {
+    unsigned char to_unorm8(float value)
+    {
+        value = std::clamp(value, 0.0f, 1.0f);
+        return static_cast<unsigned char>(value * 255.0f + 0.5f);
+    }
+}
+
 namespace Platform {
 
-    // ¾²Ì¬³ÉÔ±¶¨Òå
+    // é™æ€æˆå‘˜å®šä¹‰
     bool Win32Window::class_registered_ = false;
     const wchar_t* Win32Window::WINDOW_CLASS_NAME = L"SoftRendererWindow";
     const wchar_t* Win32Window::WINDOW_PROP_NAME = L"WindowInstance";
@@ -31,41 +41,41 @@ namespace Platform {
     }
 
     void Win32Window::create_window() {
-        // È·±£´°¿ÚÀàÒÑ×¢²á
+        // ç¡®ä¿çª—å£ç±»å·²æ³¨å†Œ
         if (!class_registered_) {
-            WNDCLASSW wc = {};                                                      // Windows API ×¢²á´°¿ÚÀà½á¹¹Ìå
-            wc.style = CS_HREDRAW | CS_VREDRAW;                                     // ´°¿ÚÀà·ç¸ñ£º¿í¶È¸ß¶È¸Ä±äÊ±ÖØ»æ
-            wc.lpfnWndProc = window_proc;                                           // ÏûÏ¢»Øµ÷º¯Êı£¨´¦ÀíËùÓĞ´°¿ÚÏûÏ¢£©
-            wc.hInstance = GetModuleHandle(nullptr);                                // Ö¸¶¨µ±Ç°³ÌĞòÊµÀı¾ä±ú
-            wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);                          // ÉèÖÃ´°¿ÚÍ¼±ê
-            wc.hCursor = LoadCursor(nullptr, IDC_ARROW);                            // ÉèÖÃ´°¿ÚÊó±êÖ¸Õë
-            wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));    // ÉèÖÃ´°¿Ú±³¾°»­Ë¢
-            wc.lpszClassName = WINDOW_CLASS_NAME;                                   // ÉèÖÃ´°¿ÚÀàÃû³Æ
+            WNDCLASSW wc = {};                                                      // Windows API æ³¨å†Œçª—å£ç±»ç»“æ„ä½“
+            wc.style = CS_HREDRAW | CS_VREDRAW;                                     // çª—å£ç±»é£æ ¼ï¼šå®½åº¦é«˜åº¦æ”¹å˜æ—¶é‡ç»˜
+            wc.lpfnWndProc = window_proc;                                           // æ¶ˆæ¯å›è°ƒå‡½æ•°ï¼ˆå¤„ç†æ‰€æœ‰çª—å£æ¶ˆæ¯ï¼‰
+            wc.hInstance = GetModuleHandle(nullptr);                                // æŒ‡å®šå½“å‰ç¨‹åºå®ä¾‹å¥æŸ„
+            wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);                          // è®¾ç½®çª—å£å›¾æ ‡
+            wc.hCursor = LoadCursor(nullptr, IDC_ARROW);                            // è®¾ç½®çª—å£é¼ æ ‡æŒ‡é’ˆ
+            wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));    // è®¾ç½®çª—å£èƒŒæ™¯ç”»åˆ·
+            wc.lpszClassName = WINDOW_CLASS_NAME;                                   // è®¾ç½®çª—å£ç±»åç§°
 
-            if (!RegisterClassW(&wc)) { // ×¢²á´°¿Ú
+            if (!RegisterClassW(&wc)) { // æ³¨å†Œçª—å£
                 throw std::runtime_error("Failed to register window class");
             }
             class_registered_ = true;
         }
 
-        // ¼ÆËã´°¿Ú³ß´ç
-        DWORD style = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;                     // ´°¿ÚÑùÊ½
-        RECT rect = { 0, 0, width_, height_ };                                      // ÃèÊö´°¿ÚµÄ¾ØĞÎÇøÓò£¨³õÊ¼ÎªÄÚÈİÇø´óĞ¡£©
-        AdjustWindowRect(&rect, style, FALSE);                                      // ¸ù¾İ´°¿ÚÑùÊ½µ÷Õûrect
+        // è®¡ç®—çª—å£å°ºå¯¸
+        DWORD style = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;                     // çª—å£æ ·å¼
+        RECT rect = { 0, 0, width_, height_ };                                      // æè¿°çª—å£çš„çŸ©å½¢åŒºåŸŸï¼ˆåˆå§‹ä¸ºå†…å®¹åŒºå¤§å°ï¼‰
+        AdjustWindowRect(&rect, style, FALSE);                                      // æ ¹æ®çª—å£æ ·å¼è°ƒæ•´rect
 
-        // ×îÖÕ´°¿ÚµÄ×Ü¿í¸ß
+        // æœ€ç»ˆçª—å£çš„æ€»å®½é«˜
         int window_width = rect.right - rect.left;
         int window_height = rect.bottom - rect.top;
 
-        // ×ª»»±êÌâÎª¿í×Ö·û
+        // è½¬æ¢æ ‡é¢˜ä¸ºå®½å­—ç¬¦
         std::wstring wide_title(title_.begin(), title_.end());
 
-        // ´´½¨´°¿Ú
+        // åˆ›å»ºçª—å£
         hwnd_ = CreateWindowW(
             WINDOW_CLASS_NAME,
             wide_title.c_str(),
             style,
-            CW_USEDEFAULT, CW_USEDEFAULT,                                           // ³õÊ¼Î»ÖÃ£¨ÉèÖÃÎªÏµÍ³¾ö¶¨£©
+            CW_USEDEFAULT, CW_USEDEFAULT,                                           // åˆå§‹ä½ç½®ï¼ˆè®¾ç½®ä¸ºç³»ç»Ÿå†³å®šï¼‰
             window_width, window_height,
             nullptr, nullptr,
             GetModuleHandle(nullptr),
@@ -76,22 +86,22 @@ namespace Platform {
             throw std::runtime_error("Failed to create window");
         }
 
-        // ÉèÖÃ´°¿ÚÊôĞÔÖ¸ÏòÕâ¸öÊµÀı
+        // è®¾ç½®çª—å£å±æ€§æŒ‡å‘è¿™ä¸ªå®ä¾‹
         SetPropW(hwnd_, WINDOW_PROP_NAME, this);
 
-        // ÏÔÊ¾´°¿Ú
+        // æ˜¾ç¤ºçª—å£
         ShowWindow(hwnd_, SW_SHOW);
 
-        // Ç¿ÖÆÁ¢¼´ÖØ»æ
+        // å¼ºåˆ¶ç«‹å³é‡ç»˜
         UpdateWindow(hwnd_);
     }
 
-    // Îª´°¿Ú´´½¨Ò»¸öÄÚ´æ»æÍ¼±íÃæ(DIB Section, Éè±¸ÎŞ¹ØÎ»Í¼)
+    // ä¸ºçª—å£åˆ›å»ºä¸€ä¸ªå†…å­˜ç»˜å›¾è¡¨é¢(DIB Section, è®¾å¤‡æ— å…³ä½å›¾)
     void Win32Window::create_surface() {
-        // »ñÈ¡´°¿ÚDC(Device Context)
+        // è·å–çª—å£DC(Device Context)
         HDC window_dc = GetDC(hwnd_);
 
-        // ´´½¨¼æÈİµÄÄÚ´æDC
+        // åˆ›å»ºå…¼å®¹çš„å†…å­˜DC
         memory_dc_ = CreateCompatibleDC(window_dc);
         ReleaseDC(hwnd_, window_dc);
 
@@ -99,14 +109,14 @@ namespace Platform {
             throw std::runtime_error("Failed to create memory DC");
         }
 
-        // ´´½¨DIB
+        // åˆ›å»ºDIB
         BITMAPINFOHEADER bmi_header = {};
         bmi_header.biSize = sizeof(BITMAPINFOHEADER);
         bmi_header.biWidth = width_;
-        bmi_header.biHeight = -height_;                                 // ¸ºÖµ±íÊ¾×ÔÉÏ¶øÏÂµÄDIB
-        bmi_header.biPlanes = 1;                                        // Î»Í¼µÄÑÕÉ«Æ½ÃæÊı£¬±ØĞëÎª1
-        bmi_header.biBitCount = 32;                                     // Ã¿¸öÏñËØµÄ±íÊ¾Î»Êı£¬32ÎªBGRA¸ñÊ½
-        bmi_header.biCompression = BI_RGB;                              // Ñ¹Ëõ·½Ê½£¬ÉèÖÃÎª²»Ñ¹Ëõ
+        bmi_header.biHeight = -height_;                                 // è´Ÿå€¼è¡¨ç¤ºè‡ªä¸Šè€Œä¸‹çš„DIB
+        bmi_header.biPlanes = 1;                                        // ä½å›¾çš„é¢œè‰²å¹³é¢æ•°ï¼Œå¿…é¡»ä¸º1
+        bmi_header.biBitCount = 32;                                     // æ¯ä¸ªåƒç´ çš„è¡¨ç¤ºä½æ•°ï¼Œ32ä¸ºBGRAæ ¼å¼
+        bmi_header.biCompression = BI_RGB;                              // å‹ç¼©æ–¹å¼ï¼Œè®¾ç½®ä¸ºä¸å‹ç¼©
 
         BITMAPINFO bmi = {};
         bmi.bmiHeader = bmi_header;
@@ -124,7 +134,7 @@ namespace Platform {
             throw std::runtime_error("Failed to create DIB section");
         }
 
-        // Ñ¡ÔñÎ»Í¼µ½ÄÚ´æDC
+        // é€‰æ‹©ä½å›¾åˆ°å†…å­˜DC
         SelectObject(memory_dc_, dib_bitmap_);
     }
 
@@ -141,20 +151,20 @@ namespace Platform {
         }
     }
 
-    // WindowsÏûÏ¢Ñ­»·£¬ÓÃÒÔ´¦Àí´°¿ÚÊÂ¼ş
+    // Windowsæ¶ˆæ¯å¾ªç¯ï¼Œç”¨ä»¥å¤„ç†çª—å£äº‹ä»¶
     void Win32Window::poll_events() {
         MSG msg;
-        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) { // ´Óµ±Ç°Ïß³ÌµÄÏûÏ¢¶ÓÁĞÖĞ»ñÈ¡Ò»ÌõÏûÏ¢
-            TranslateMessage(&msg);     // ¶Ô¼üÅÌÏûÏ¢½øĞĞ×ª»»
-            DispatchMessageW(&msg);     // ·Ö·¢ÏûÏ¢µ½×¢²áµÄ´°¿Ú
+        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) { // ä»å½“å‰çº¿ç¨‹çš„æ¶ˆæ¯é˜Ÿåˆ—ä¸­è·å–ä¸€æ¡æ¶ˆæ¯
+            TranslateMessage(&msg);     // å¯¹é”®ç›˜æ¶ˆæ¯è¿›è¡Œè½¬æ¢
+            DispatchMessageW(&msg);     // åˆ†å‘æ¶ˆæ¯åˆ°æ³¨å†Œçš„çª—å£
         }
     }
 
-    // ½«Èí¼şäÖÈ¾½á¹ûÏÔÊ¾µ½´°¿ÚÉÏ
+    // å°†è½¯ä»¶æ¸²æŸ“ç»“æœæ˜¾ç¤ºåˆ°çª—å£ä¸Š
     void Win32Window::present_framebuffer(const Framebuffer& framebuffer) {
         blit_framebuffer_to_surface(framebuffer);
 
-        // ½«ÄÚ´æDCµÄÄÚÈİ¸´ÖÆµ½´°¿Ú
+        // å°†å†…å­˜DCçš„å†…å®¹å¤åˆ¶åˆ°çª—å£
         HDC window_dc = GetDC(hwnd_);
         BitBlt(window_dc, 0, 0, width_, height_, memory_dc_, 0, 0, SRCCOPY);
         ReleaseDC(hwnd_, window_dc);
@@ -163,20 +173,24 @@ namespace Platform {
     void Win32Window::blit_framebuffer_to_surface(const Framebuffer& framebuffer) {
         assert(framebuffer.get_width() == width_ && framebuffer.get_height() == height_);
 
-        const auto& color_buffer = framebuffer.get_color_buffer();
-
-        // ×ª»»RGBAµ½BGRA²¢¿½±´µ½surface
+        // çº¿æ€§ HDR framebuffer -> Reinhard -> sRGB 8-bit BGRA surface
         for (int y = 0; y < height_; ++y) {
             for (int x = 0; x < width_; ++x) {
                 int flipped = height_ - 1 - y;
-                int src_index = (y * width_ + x) * 4;
+                int src_index = y * width_ + x;
                 int dst_index = (flipped * width_ + x) * 4;
 
-                // RGBA -> BGRA ×ª»»
-                surface_buffer_[dst_index + 0] = color_buffer[src_index + 2]; // B
-                surface_buffer_[dst_index + 1] = color_buffer[src_index + 1]; // G
-                surface_buffer_[dst_index + 2] = color_buffer[src_index + 0]; // R
-                surface_buffer_[dst_index + 3] = color_buffer[src_index + 3]; // A
+                const Eigen::Vector4f linear_hdr = framebuffer.get_color(src_index);
+                const Eigen::Vector3f display_linear =
+                    ToneMapping::reinhard(linear_hdr.head<3>());
+
+                surface_buffer_[dst_index + 0] =
+                    to_unorm8(ColorSpace::linear_to_srgb(display_linear.z()));
+                surface_buffer_[dst_index + 1] =
+                    to_unorm8(ColorSpace::linear_to_srgb(display_linear.y()));
+                surface_buffer_[dst_index + 2] =
+                    to_unorm8(ColorSpace::linear_to_srgb(display_linear.x()));
+                surface_buffer_[dst_index + 3] = to_unorm8(linear_hdr.w());
             }
         }
     }
@@ -317,17 +331,17 @@ namespace Platform {
     }
 
     void initialize_platform() {
-        // ÉèÖÃ¹¤×÷Ä¿Â¼µ½assetsÎÄ¼ş¼Ğ
+        // è®¾ç½®å·¥ä½œç›®å½•åˆ°assetsæ–‡ä»¶å¤¹
         wchar_t path[MAX_PATH];
         GetModuleFileNameW(nullptr, path, MAX_PATH);
         *wcsrchr(path, L'\\') = L'\0';
         SetCurrentDirectoryW(path);
 
-        // ³¢ÊÔ½øÈëassetsÄ¿Â¼
+        // å°è¯•è¿›å…¥assetsç›®å½•
         std::cout << "Trying to enter assets directory" << std::endl;
 
         if (SetCurrentDirectoryW(L"assets") == 0) {
-            // Èç¹ûÊ§°Ü£¬¿ÉÄÜÊÇÔÚ²»Í¬µÄÄ¿Â¼½á¹¹ÖĞ£¬³¢ÊÔÆäËûÂ·¾¶
+            // å¦‚æœå¤±è´¥ï¼Œå¯èƒ½æ˜¯åœ¨ä¸åŒçš„ç›®å½•ç»“æ„ä¸­ï¼Œå°è¯•å…¶ä»–è·¯å¾„
             SetCurrentDirectoryW(L"../assets");
         }
     }

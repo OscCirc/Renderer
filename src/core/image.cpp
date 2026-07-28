@@ -8,7 +8,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-// ¸¨Öúº¯Êı£º»ñÈ¡ÎÄ¼şÀ©Õ¹Ãû
+// è¾…åŠ©å‡½æ•°ï¼šè·å–æ–‡ä»¶æ‰©å±•å
 static std::string get_extension(const std::string& filename) {
     size_t dot_pos = filename.find_last_of('.');
     if (dot_pos == std::string::npos) {
@@ -55,7 +55,7 @@ void convertBGRAtoRGBA(unsigned char* data, int& width, int& height) {
     const int totalPixels = width * height;
     for (int i = 0; i < totalPixels; i++) {
         unsigned char* pixel = data + i * 4;
-        std::swap(pixel[0], pixel[2]); // ½»»»RºÍBÍ¨µÀ
+        std::swap(pixel[0], pixel[2]); // äº¤æ¢Rå’ŒBé€šé“
     }
 }
 unsigned char* loadRGBA(const std::string& filename,
@@ -63,10 +63,10 @@ unsigned char* loadRGBA(const std::string& filename,
     int& height,
     bool flipVertical) {
 
-    // ÉèÖÃ´¹Ö±·­×ª£¨¿ÉÑ¡£©
+    // è®¾ç½®å‚ç›´ç¿»è½¬ï¼ˆå¯é€‰ï¼‰
     stbi_set_flip_vertically_on_load(flipVertical);
 
-    // ¼ÓÔØÍ¼Ïñ²¢Ç¿ÖÆ4Í¨µÀ
+    // åŠ è½½å›¾åƒå¹¶å¼ºåˆ¶4é€šé“
     int origChannels;
     unsigned char* data = stbi_load(filename.c_str(),
         &width,
@@ -76,20 +76,20 @@ unsigned char* loadRGBA(const std::string& filename,
 
     if (!data) return nullptr;
 
-    // ¸ù¾İÔ­Ê¼¸ñÊ½×ª»»Í¨µÀË³Ğò
+    // æ ¹æ®åŸå§‹æ ¼å¼è½¬æ¢é€šé“é¡ºåº
     std::string ext = filename.substr(filename.find_last_of(".") + 1);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
     if (ext == "tga" || ext == "bmp") {
-        // TGAºÍBMPÊÇBGRAË³Ğò£¬×ª»»ÎªRGBA
+        // TGAå’ŒBMPæ˜¯BGRAé¡ºåºï¼Œè½¬æ¢ä¸ºRGBA
         convertBGRAtoRGBA(data, width, height);
     }
-    // ÆäËû¸ñÊ½ÈçPNG¡¢JPGÍ¨³£ÊÇRGBA»òRGB£¬²»ĞèÒª×ª»»
+    // å…¶ä»–æ ¼å¼å¦‚PNGã€JPGé€šå¸¸æ˜¯RGBAæˆ–RGBï¼Œä¸éœ€è¦è½¬æ¢
 
     return data;
 }
 
-// --- Image ÀàÊµÏÖ ---
+// --- Image ç±»å®ç° ---
 
 Image::Image(int width, int height, int channels, ImageFormat format)
     : format(format), width(width), height(height), channels(channels) {
