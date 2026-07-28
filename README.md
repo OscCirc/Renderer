@@ -1,36 +1,81 @@
 # Software Renderer
-本项目为Windows平台下的 C++ 3D 软光栅渲染器。
 
-核心功能与技术实现：
-- 完整渲染管线：实现了从模型变换、齐次裁剪、背面剔除、透视校正插值、深度测试到Blinn-Phong光照模型的完整渲染流程。
-- 着色技术：实现了切线空间法线贴图以增加表面细节，并集成了阴影贴图以实现动态阴影。
-- 动画与交互：集成了骨骼动画系统（顶点蒙皮），并实现了一个环绕式相机（Orbit Camera）用于场景交互。
-- 底层架构：使用 Eigen 数学库执行线性代数计算。平台层仿照 GLFW 的接口，自行封装了简单的图形界面、窗口创建和事件循
-环。I/O使用 stb_image 库进行纹理和图像文件的加载与处理。
+本项目为Windows 平台下的 C++ 3D 软光栅渲染器。
+
+## 主要实现
+
+- 软件光栅化管线：实现 Model/View/Projection 变换、齐次裁剪、背面剔除、Top-left 覆盖规则、透视校正插值与深度测试。
+- 纹理与着色：支持 Nearest/Bilinear/Trilinear 纹理采样、Mipmap LOD、Blinn–Phong、切线空间法线贴图与 Shadow Mapping。
+- 场景与动画：支持 OBJ/`.scn` 加载、Orbit Camera、骨骼层级、关键帧插值与顶点蒙皮。
+
+## 场景
+
+| Azura | Centaur |
+| --- | --- |
+| <img src="outputs/azura.gif" width="420"> | <img src="outputs/centaur.gif" width="420"> |
+
+| Craftsman | Phoenix |
+| --- | --- |
+| <img src="outputs/craftsman.gif" width="420"> | <img src="outputs/phoenix.gif" width="420"> |
+
+| KGirl | Lighthouse |
+| --- | --- |
+| <img src="outputs/kgirl.gif" width="420"> | <img src="outputs/lighthouse.gif" width="420"> |
+
+## 构建与运行
+
+### 环境要求
+
+- Windows 10/11
+- Visual Studio 2022 或支持 C++17 的 MSVC 工具链
+- CMake 3.15+
+- vcpkg
+- Eigen3、stb
+
+### 配置、编译与测试
+
+```powershell
+vcpkg install eigen3:x64-windows stb:x64-windows
+
+cmake -S . -B build `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+  -DVCPKG_TARGET_TRIPLET=x64-windows
+
+cmake --build build --config Release
+```
+
+CMake 会将 `assets/` 自动复制到可执行文件目录。
+
+### 运行示例
+
+```powershell
+# Azura 场景
+.\build\bin\Release\SoftRenderer.exe azura
+
+# Centaur 场景
+.\build\bin\Release\SoftRenderer.exe centaur
+
+# Lighthouse 场景
+.\build\bin\Release\SoftRenderer.exe lighthouse
+```
+
+```text
+SoftRenderer.exe [scene_name]
+```
+
+经典场景包括 `azura`、`centaur`、`craftsman`、`phoenix`、`kgirl` 和 `lighthouse`。
+
+### 交互
+
+| 操作 | 功能 |
+| --- | --- |
+| 鼠标左键拖拽 | Orbit 旋转 |
+| 鼠标右键拖拽 | Pan 平移 |
+| 鼠标滚轮 | Dolly 推拉 |
+| `Space` | 重置相机与光照 |
+| `W/A/S/D` | 调整光照方向 |
+| `1/2/3` | Nearest / Bilinear / Trilinear |
 
 ## 参考
-主要参考了 C 项目：
-https://github.com/zauonlok/renderer
 
-## 文档入口
-
-- [项目地图](docs/project_map.md)：重新接手项目时的主入口，包含构建、运行、调用链、资源加载和维护建议。
-- [架构文档](ARCHITECTURE.md)：模块关系、类关系和渲染管线图。
-- [Application 拆分指南](docs/refactor_application.md)：应用层重构的历史计划和后续拆分参考。
-- [技术路线](TODO.md)：下一步功能开发计划。
-
-
-## Screenshots
-
-| Scene                                                                                   | Command                   |
-| --------------------------------------------------------------------------------------- | ------------------------- |
-| [<img src="outputs/azura.gif" width="600">](outputs/azura/README.md)           | `SoftRenderer blinn azura`      |
-| [<img src="outputs/centaur.gif" width="600">](outputs/centaur/README.md)       | `SoftRenderer blinn centaur`    |
-| [<img src="outputs/craftsman.gif" width="600">](outputs/craftsman/README.md)  | `SoftRenderer blinn craftsman`  |
-| [<img src="outputs/kgirl.gif" width="600">](outputs/kgirl/README.md)           | `SoftRenderer blinn kgirl`      |
-| [<img src="outputs/lighthouse.gif" width="600">](outputs/lighthouse/README.md) | `SoftRenderer blinn lighthouse` |
-| [<img src="outputs/phoenix.gif" width="600">](outputs/phoenix/README.md)       | `SoftRenderer blinn phoenix`    |
-
-## TODO
-- pbr实现
-- 采样方法改进
+项目早期实现参考了 C 项目 [zauonlok/renderer](https://github.com/zauonlok/renderer)。本项目将其改造为 C++ 工程，并在此基础上做了扩展。

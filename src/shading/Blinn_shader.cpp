@@ -2,13 +2,10 @@
 
 /* Vertex Shader */
 
-// 获取模型矩阵
+// 模型矩阵: 接收模型空间顶点坐标->通过skin_matrix(globa_transform * IBM)作用得到新的模型空间坐标 -> 经过uniforms.model_matrix从模型空间变换到世界空间坐标
 static Eigen::Matrix4f get_model_matrix(const blinn_attribs& attribs, blinn_uniforms& uniforms){
-    
-    Eigen::Matrix4f skin_matrix = Eigen::Matrix4f::Identity();
-
     if(uniforms.joint_matrices){ // 蒙皮
-        skin_matrix = Eigen::Matrix4f::Zero();
+        Eigen::Matrix4f skin_matrix = Eigen::Matrix4f::Zero();
         for(int i=0;i<4;i++){
             float w = attribs.weight[i];
             if (w <= 0.0f) continue; // 跳过权重为0的分量
@@ -27,7 +24,9 @@ static Eigen::Matrix4f get_model_matrix(const blinn_attribs& attribs, blinn_unif
 
 }
 
-// 获取法线矩阵
+// 获取法线矩阵：接收模型空间法线，输出变换后的法线（世界空间下）
+
+/* SkinNormal 约等于 \sum(w_i × JointNormalMatrix_i) 但不保证变换后的法线严格垂直于变换后的切平面
 static Eigen::Matrix3f get_normal_matrix(const blinn_attribs& attribs, blinn_uniforms& uniforms){
     if(uniforms.joint_n_matrices){ // 蒙皮
         Eigen::Matrix3f skin_n_matrix = Eigen::Matrix3f::Zero();
@@ -40,12 +39,22 @@ static Eigen::Matrix3f get_normal_matrix(const blinn_attribs& attribs, blinn_uni
 
             // 将该关节的法线矩阵按权重累加
             skin_n_matrix += uniforms.joint_n_matrices[joint_index] * w;
+            
         }
         return uniforms.normal_matrix * skin_n_matrix;
     }
     else{ // 无骨骼或骨骼附着
         return uniforms.normal_matrix;
     }
+}
+*/
+
+// 从最终的顶点变换矩阵构造法线矩阵。
+static Eigen::Matrix3f get_normal_matrix(const Eigen::Matrix4f& vertex_matrix)
+{
+    const Eigen::Matrix3f linear_matrix = vertex_matrix.block<3, 3>(0, 0);
+
+    return linear_matrix.inverse().transpose();
 }
 
 // 仅计算深度图的顶点着色器
@@ -65,9 +74,9 @@ static Eigen::Vector4f shadow_vertex_shader(const blinn_attribs& attribs, blinn_
 // 常规着色器，计算顶点裁切空间坐标，并将相关数据传递到varyings
 static Eigen::Vector4f common_vertex_shader(const blinn_attribs& attribs, blinn_varyings& varyings, blinn_uniforms& uniforms){ 
     Eigen::Matrix4f model_matrix = get_model_matrix(attribs, uniforms);
-    Eigen::Matrix3f normal_matrix = get_normal_matrix(attribs, uniforms);
-    Eigen::Matrix4f camera_vp_matrix = uniforms.camera_vp_matrix;
-    Eigen::Matrix4f light_vp_matrix = uniforms.light_vp_matrix;
+    Eigen::Matrix3f normal_matrix = get_normal_matrix(model_matrix);
+    Eigen::Matrix4f& camera_vp_matrix = uniforms.camera_vp_matrix;
+    Eigen::Matrix4f& light_vp_matrix = uniforms.light_vp_matrix;
 
     Eigen::Vector4f input_position = Eigen::Vector4f(attribs.position.x(), attribs.position.y(), attribs.position.z(), 1.0f);
     Eigen::Vector4f world_position = model_matrix * input_position;
@@ -80,8 +89,14 @@ static Eigen::Vector4f common_vertex_shader(const blinn_attribs& attribs, blinn_
 
     // world tangent
     Eigen::Vector3f input_tangent = attribs.tangent.head<3>();
-    Eigen::Vector3f tangent = (normal_matrix * input_tangent).normalized();
-    // orthogonalization
+
+    // 下一行代码是原始的切线变换方式，normal_matrix是model_matrix的左上3*3子阵的逆转置，当该子阵只包含旋转和均匀缩放时，其逆转置就是自身乘一个整体比例（经过归一化后消除）。
+    // 但是如果缩放非均匀，则不成立，故我们采用更严谨的做法
+    // Eigen::Vector3f tangent = (normal_matrix * input_tangent).normalized();
+    Eigen::Vector3f tangent = (model_matrix.block<3,3>(0, 0) * input_tangent).normalized();
+    
+    // orthogonalization, 理论上我们不需要再做正交化：我们已经精确实现了切线和法线的变换，但是考虑到即使矩阵关系精确，模型导入的切线可能本就不完全正交，且顶点插值后也会产生偏差。
+    // 我们因此保留Gram-Schmidt正交化来作为防御性措施
     tangent = (tangent - normal * normal.dot(tangent)).normalized();    
 
     // world bitangent

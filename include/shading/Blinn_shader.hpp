@@ -6,12 +6,12 @@
 
 // Attribs 结构体，定义了顶点属性
 struct blinn_attribs{
-    Eigen::Vector3f position;
-    Eigen::Vector2f texcoord;
-    Eigen::Vector3f normal;
-    Eigen::Vector4f tangent;
-    Eigen::Vector4f joint;
-    Eigen::Vector4f weight;
+    Eigen::Vector3f position;   // 模型空间位置
+    Eigen::Vector2f texcoord;   // UV
+    Eigen::Vector3f normal;     // 模型空间法线
+    Eigen::Vector4f tangent;    // xyz: 切线; w: 副切线方向符号
+    Eigen::Vector4f joint;      // 最多4个骨骼索引
+    Eigen::Vector4f weight;     // 最多4个骨骼权重
 };
 
 // Material 结构体，定义了 Blinn-Phong 着色模型的材质属性
@@ -79,19 +79,25 @@ struct blinn_varyings {
 
 // Uniforms 结构体，包含着色器所需的全局数据
 struct blinn_uniforms{
+    // 逐帧状态
     Eigen::Vector3f light_dir;
     Eigen::Vector3f camera_pos;
-    Eigen::Matrix4f model_matrix;
-    Eigen::Matrix3f normal_matrix;          // 法线变换矩阵
-    Eigen::Matrix4f light_vp_matrix;      
-    Eigen::Matrix4f camera_vp_matrix;
-    Eigen::Matrix4f *joint_matrices;
-    Eigen::Matrix3f *joint_n_matrices;
     float ambient_intensity;                // 环境光强度
     float punctual_intensity;               // 点光源强度
     Texture *shadow_map;
-    /* surface parameters */
-    Eigen::Vector4f basecolor;
+
+    // 变换阵
+    Eigen::Matrix4f model_matrix;           // 模型空间 -> 世界空间
+    Eigen::Matrix3f normal_matrix;          // 法线变换矩阵
+    Eigen::Matrix4f light_vp_matrix;        // projection * view 
+    Eigen::Matrix4f camera_vp_matrix;       // projection * view
+    
+    // 骨骼
+    Eigen::Matrix4f *joint_matrices;
+    Eigen::Matrix3f *joint_n_matrices;
+    
+    // 材质，Blinn_Phong_Model创建时即初始化
+    Eigen::Vector4f basecolor;              
     float shininess;
     std::shared_ptr<Texture> diffuse_map;
     std::shared_ptr<Texture> specular_map;
